@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Generation App - Wireframes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #1a1a1a;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        h2 {
+            color: #333;
+            margin: 30px 0 20px 0;
+            font-size: 20px;
+            padding: 10px;
+            background: #e0e0e0;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .wireframe-section {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .layout-grid {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .two-column {
+            grid-template-columns: 1fr 1fr;
+        }
+        
+        .three-column {
+            grid-template-columns: 1fr 2fr 1fr;
+        }
+        
+        .sidebar-content {
+            grid-template-columns: 250px 1fr 350px;
+        }
+        
+        .box {
+            border: 2px solid #999;
+            border-radius: 4px;
+            padding: 15px;
+            background: #fafafa;
+            min-height: 100px;
+        }
+        
+        .tall-box {
+            min-height: 400px;
+        }
+        
+        .input-field {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 8px;
+            margin: 5px 0;
+            width: 100%;
+            background: white;
+        }
+        
+        .button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            display: inline-block;
+        }
+        
+        .button.secondary {
+            background: #757575;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background: #e0e0e0;
+            border-radius: 4px 4px 0 0;
+            cursor: pointer;
+        }
+        
+        .tab.active {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .model-card {
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            background: white;
+        }
+        
+        .model-card.selected {
+            border-color: #4CAF50;
+            background: #e8f5e9;
+        }
+        
+        .slider-group {
+            margin: 15px 0;
+        }
+        
+        .slider {
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        .checkbox-group, .radio-group {
+            margin: 10px 0;
+        }
+        
+        .checkbox-group label, .radio-group label {
+            display: block;
+            margin: 5px 0;
+        }
+        
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .gallery-item {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            background: white;
+        }
+        
+        .gallery-item-image {
+            width: 100%;
+            height: 150px;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+        
+        .gallery-item-info {
+            padding: 10px;
+            font-size: 12px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        
+        .accordion {
+            margin: 20px 0;
+        }
+        
+        .accordion-item {
+            border: 1px solid #ddd;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .accordion-header {
+            padding: 15px;
+            background: #f5f5f5;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .accordion-content {
+            padding: 15px;
+            background: white;
+        }
+        
+        .tag {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin: 2px;
+            font-size: 12px;
+        }
+        
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+        }
+        
+        .divider {
+            height: 1px;
+            background: #ddd;
+            margin: 20px 0;
+        }
+        
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Enhanced Image Generation App - Complete Wireframes</h1>
+        
+        <!-- Main Generation View -->
+        <h2>View 1: Main Generation Interface</h2>
+        <div class="wireframe-section">
+            <div class="tabs">
+                <div class="tab active">🖼️ Image Generation</div>
+                <div class="tab">🎬 Video Generation</div>
+                <div class="tab">📊 Dashboard</div>
+                <div class="tab">🗂️ Projects</div>
+                <div class="tab">⚙️ Settings</div>
+            </div>
+            
+            <div class="layout-grid sidebar-content">
+                <!-- Left Sidebar - Model Selection -->
+                <div class="box">
+                    <h3>Model Configuration</h3>
+                    <div class="divider"></div>
+                    
+                    <label>Provider:</label>
+                    <select class="input-field">
+                        <option>Fal.ai</option>
+                        <option>Replicate</option>
+                        <option>OpenAI (DALL-E)</option>
+                        <option>OpenRouter</option>
+                    </select>
+                    
+                    <label>Model:</label>
+                    <div class="model-grid">
+                        <div class="model-card selected">SDXL</div>
+                        <div class="model-card">SD 1.5</div>
+                        <div class="model-card">DALL-E 3</div>
+                        <div class="model-card">Midjourney</div>
+                        <div class="model-card">Flux</div>
+                        <div class="model-card">Stable Cascade</div>
+                        <div class="model-card">PixArt</div>
+                        <div class="model-card">Custom</div>
+                    </div>
+                    
+                    <button class="button secondary" style="width: 100%">🔄 Check Model Status</button>
+                    
+                    <div class="divider"></div>
+                    
+                    <h4>Quick Presets</h4>
+                    <select class="input-field">
+                        <option>-- Select Preset --</option>
+                        <option>Photorealistic</option>
+                        <option>Anime Style</option>
+                        <option>Oil Painting</option>
+                        <option>3D Render</option>
+                        <option>Sketch</option>
+                    </select>
+                    
+                    <button class="button secondary" style="width: 100%">💾 Save Current as Preset</button>
+                </div>
+                
+                <!-- Center - Main Controls -->
+                <div class="box tall-box">
+                    <h3>Generation Controls</h3>
+                    <div class="divider"></div>
+                    
+                    <label>Project:</label>
+                    <select class="input-field">
+                        <option>Default Project</option>
+                        <option>Character Design</option>
+                        <option>Landscape Study</option>
+                        <option>+ New Project</option>
+                    </select>
+                    
+                    <label>Prompt:</label>
+                    <textarea class="input-field" rows="4" placeholder="Describe what you want to generate..."></textarea>
+                    
+                    <label>Negative Prompt:</label>
+                    <textarea class="input-field" rows="3" placeholder="What to avoid in the generation..."></textarea>
+                    
+                    <div class="layout-grid two-column">
+                        <div>
+                            <label>Aspect Ratio:</label>
+                            <select class="input-field">
+                                <option>1:1 (Square)</option>
+                                <option>16:9 (Landscape)</option>
+                                <option>9:16 (Portrait)</option>
+                                <option>4:3 (Classic)</option>
+                                <option>Custom</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Size:</label>
+                            <div style="display: flex; gap: 5px;">
+                                <input class="input-field" placeholder="Width" value="1024">
+                                <input class="input-field" placeholder="Height" value="1024">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion">
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <span>⚡ Advanced Parameters</span>
+                                <span>▼</span>
+                            </div>
+                            <div class="accordion-content">
+                                <div class="slider-group">
+                                    <label>Sampling Steps: <span>20</span></label>
+                                    <input type="range" class="slider" min="1" max="50" value="20">
+                                </div>
+                                
+                                <div class="slider-group">
+                                    <label>CFG Scale: <span>7.5</span></label>
+                                    <input type="range" class="slider" min="1" max="20" value="7.5">
+                                </div>
+                                
+                                <div class="slider-group">
+                                    <label>Seed: <span>-1 (Random)</span></label>
+                                    <input class="input-field" placeholder="-1 for random" value="-1">
+                                </div>
+                                
+                                <label>Sampler:</label>
+                                <select class="input-field">
+                                    <option>DPM++ 2M Karras</option>
+                                    <option>Euler a</option>
+                                    <option>DDIM</option>
+                                    <option>LMS</option>
+                                </select>
+                                
+                                <label>Scheduler:</label>
+                                <select class="input-field">
+                                    <option>Karras</option>
+                                    <option>Normal</option>
+                                    <option>Simple</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <span>🖼️ Image-to-Image</span>
+                                <span>▼</span>
+                            </div>
+                            <div class="accordion-content">
+                                <div class="box" style="min-height: 150px; text-align: center; display: flex; align-items: center; justify-content: center;">
+                                    <div>
+                                        <p>📁 Drop image here or click to browse</p>
+                                        <button class="button secondary">Choose File</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="slider-group">
+                                    <label>Denoising Strength: <span>0.75</span></label>
+                                    <input type="range" class="slider" min="0" max="1" step="0.05" value="0.75">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <span>🎯 Batch Generation</span>
+                                <span>▼</span>
+                            </div>
+                            <div class="accordion-content">
+                                <label>Number of Images:</label>
+                                <input class="input-field" type="number" value="1" min="1" max="10">
+                                
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox"> Vary seeds automatically</label>
+                                    <label><input type="checkbox"> Create variations grid</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button class="button" style="flex: 1; padding: 15px; font-size: 16px;">
+                            🚀 Generate
+                        </button>
+                        <button class="button secondary">
+                            🎲 Random Prompt
+                        </button>
+                        <button class="button secondary">
+                            🔄 Reset
+                        </button>
+                    </div>
+                    
+                    <div class="note">
+                        💡 Tip: Use keyboard shortcut Ctrl+Enter to generate quickly
+                    </div>
+                </div>
+                
+                <!-- Right Sidebar - Output & History -->
+                <div class="box">
+                    <h3>Output & History</h3>
+                    <div class="divider"></div>
+                    
+                    <div class="toolbar">
+                        <div>
+                            <button class="button secondary">Grid</button>
+                            <button class="button secondary">List</button>
+                        </div>
+                        <div>
+                            <input type="search" placeholder="Search..." style="padding: 5px;">
+                        </div>
+                    </div>
+                    
+                    <div class="box" style="height: 300px; display: flex; align-items: center; justify-content: center;">
+                        <div style="text-align: center;">
+                            <h4>Current Generation</h4>
+                            <p>[Image Preview]</p>
+                            <div style="margin-top: 10px;">
+                                <button class="button secondary">💾</button>
+                                <button class="button secondary">⭐</button>
+                                <button class="button secondary">🔄</button>
+                                <button class="button secondary">📋</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h4>Recent Generations</h4>
+                    <div style="max-height: 300px; overflow-y: auto;">
+                        <div class="gallery-item" style="margin-bottom: 10px;">
+                            <div class="gallery-item-image">Image 1</div>
+                            <div class="gallery-item-info">
+                                <div><strong>SDXL</strong> • 2 min ago</div>
+                                <div style="font-size: 11px; color: #666;">"A beautiful landscape..."</div>
+                                <div>
+                                    <span class="tag">1024x1024</span>
+                                    <span class="tag">7.5 CFG</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gallery-item" style="margin-bottom: 10px;">
+                            <div class="gallery-item-image">Image 2</div>
+                            <div class="gallery-item-info">
+                                <div><strong>DALL-E 3</strong> • 5 min ago</div>
+                                <div style="font-size: 11px; color: #666;">"Portrait of..."</div>
+                                <div>
+                                    <span class="tag">1024x1024</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dashboard View -->
+        <h2>View 2: Dashboard & Analytics</h2>
+        <div class="wireframe-section">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">1,234</div>
+                    <div class="stat-label">Total Generations</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <div class="stat-number">47</div>
+                    <div class="stat-label">Today</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <div class="stat-number">8</div>
+                    <div class="stat-label">Models Used</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                    <div class="stat-number">156</div>
+                    <div class="stat-label">Favorites</div>
+                </div>
+            </div>
+            
+            <div class="layout-grid two-column">
+                <div class="box">
+                    <h3>📊 Usage by Provider</h3>
+                    <div class="divider"></div>
+                    <div style="padding: 20px;">
+                        <div style="margin: 10px 0;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>Fal.ai</span>
+                                <span>567 (46%)</span>
+                            </div>
+                            <div style="background: #e0e0e0; height: 20px; border-radius: 4px; margin-top: 5px;">
+                                <div style="background: #4CAF50; width: 46%; height: 100%; border-radius: 4px;"></div>
+                            </div>
+                        </div>
+                        <div style="margin: 10px 0;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>Replicate</span>
+                                <span>345 (28%)</span>
+                            </div>
+                            <div style="background: #e0e0e0; height: 20px; border-radius: 4px; margin-top: 5px;">
+                                <div style="background: #2196F3; width: 28%; height: 100%; border-radius: 4px;"></div>
+                            </div>
+                        </div>
+                        <div style="margin: 10px 0;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>OpenAI</span>
+                                <span>234 (19%)</span>
+                            </div>
+                            <div style="background: #e0e0e0; height: 20px; border-radius: 4px; margin-top: 5px;">
+                                <div style="background: #FF9800; width: 19%; height: 100%; border-radius: 4px;"></div>
+                            </div>
+                        </div>
+                        <div style="margin: 10px 0;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>OpenRouter</span>
+                                <span>88 (7%)</span>
+                            </div>
+                            <div style="background: #e0e0e0; height: 20px; border-radius: 4px; margin-top: 5px;">
+                                <div style="background: #9C27B0; width: 7%; height: 100%; border-radius: 4px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="box">
+                    <h3>📈 Generation Trend (Last 7 Days)</h3>
+                    <div class="divider"></div>
+                    <div style="padding: 20px; height: 200px; display: flex; align-items: flex-end; justify-content: space-around;">
+                        <div style="background: #4CAF50; width: 40px; height: 60%;"></div>
+                        <div style="background: #4CAF50; width: 40px; height: 80%;"></div>
+                        <div style="background: #4CAF50; width: 40px; height: 45%;"></div>
+                        <div style="background: #4CAF50; width: 40px; height: 90%;"></div>
+                        <div style="background: #4CAF50; width: 40px; height: 70%;"></div>
+                        <div style="background: #4CAF50; width: 40px; height: 85%;"></div>
+                        <div style="background: #8BC34A; width: 40px; height: 100%;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-around; padding: 0 20px;">
+                        <span>Mon</span>
+                        <span>Tue</span>
+                        <span>Wed</span>
+                        <span>Thu</span>
+                        <span>Fri</span>
+                        <span>Sat</span>
+                        <span>Today</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="box">
+                <h3>🏆 Top Performing Prompts</h3>
+                <div class="divider"></div>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f5f5f5;">
+                            <th style="padding: 10px; text-align: left;">Prompt</th>
+                            <th style="padding: 10px;">Model</th>
+                            <th style="padding: 10px;">Uses</th>
+                            <th style="padding: 10px;">Avg Rating</th>
+                            <th style="padding: 10px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 10px;">"Cyberpunk city at night, neon lights..."</td>
+                            <td style="padding: 10px; text-align: center;">SDXL</td>
+                            <td style="padding: 10px; text-align: center;">23</td>
+                            <td style="padding: 10px; text-align: center;">⭐⭐⭐⭐⭐</td>
+                            <td style="padding: 10px; text-align: center;">
+                                <button class="button secondary" style="padding: 5px 10px;">Use</button>
+                            </td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 10px;">"Portrait of a wizard, oil painting style..."</td>
+                            <td style="padding: 10px; text-align: center;">Flux</td>
+                            <td style="padding: 10px; text-align: center;">18</td>
+                            <td style="padding: 10px; text-align: center;">⭐⭐⭐⭐</td>
+                            <td style="padding: 10px; text-align: center;">
+                                <button class="button secondary" style="padding: 5px 10px;">Use</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Projects View -->
+        <h2>View 3: Projects & Collections</h2>
+        <div class="wireframe-section">
+            <div class="toolbar">
+                <div>
+                    <button class="button">+ New Project</button>
+                    <button class="button secondary">📁 New Collection</button>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <select class="input-field" style="width: 150px;">
+                        <option>All Projects</option>
+                        <option>Active</option>
+                        <option>Archived</option>
+                    </select>
+                    <input type="search" placeholder="Search projects..." style="padding: 5px;">
+                </div>
+            </div>
+            
+            <div class="layout-grid three-column">
+                <div class="box">
+                    <h4>🎨 Character Design</h4>
+                    <div class="divider"></div>
+                    <p style="color: #666; font-size: 14px;">Fantasy character concepts for game project</p>
+                    <div style="margin: 15px 0;">
+                        <span class="tag">234 images</span>
+                        <span class="tag">SDXL</span>
+                        <span class="tag">Active</span>
+                    </div>
+                    <div class="gallery-grid" style="grid-template-columns: repeat(2, 1fr);">
+                        <div class="gallery-item-image" style="height: 80px; font-size: 12px;">Preview</div>
+                        <div class="gallery-item-image" style="height: 80px; font-size: 12px;">Preview</div>
+                        <div class="gallery-item-image" style="height: 80px; font-size: 12px;">Preview</div>
+                        <div class="gallery-item-image" style="height: 80px; font-size: 12px;">Preview</div>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <button class="button" style="width: 100%;">Open Project</button>
+                    </div>
+                </div>
+                
+                <div class="box">
+                    <h4>🏞️ Landscape Study</h4>
+                    <div class="divider"></div>
+                    <p style="color: #666; font-size: 14px;">Various landscape and environment concepts</p>
+                    <div style="margin: 15px 0;">
+                        <span class="tag">156 images</span>
+                        <span class="tag">Multiple</span>
+                        <span class="tag">Active</span>
+                    </div>
+                    <div class="gallery-grid" style="grid-template-columns: repeat(2, 1fr);">
+                        <div class="gallery-item-image" style="height: 80px; font-size: 12px;">Preview</div>
+                        <div class="gallery-item-image" style="height: 80px; font-size: 12px;">Preview</div>
+                        <div class="gallery-item-image" style="height: 80px; font-size: 12px;">Preview</div>
+                        <div class="gallery-item-image" style="height: 80px; font-size: 12px;">Preview</div>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <button class="button" style="width: 100%;">Open Project</button>
+                    </div>
+                </div>
+                
+                <div class="box">
+                    <h4>🤖 AI Art Experiments</h4>
+                    <div class="divider"></div>
+                    <p style="color: #666; font-size: 14px;">Testing different models and techniques</p>
+                    <div style="margin: 15px 0;">
+                        <span class="tag">89 images</span>
+                        <span class="tag">Various</span>
+                        <span class="tag">Active</span>
+                    </div>
+                    <div class="gallery-grid" style="grid-template-columns: repeat(2, 1fr);">
+                        <div class="gallery-item-image" style="height: 80px; font-size: 12px;">Preview</div>
+                        <div class="gallery-item-image" style="height: 80px; font-size: 12px;">Preview</div>
+                        <div class="gallery-item-image" style="height: 80px; font-size: 12px;">Preview</div>
+                        <div class="gallery-item-image" style="height: 80px; font-size: 12px;">Preview</div>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <button class="button" style="width: 100%;">Open Project</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Settings View -->
+        <h2>View 4: Settings & Configuration</h2>
+        <div class="wireframe-section">
+            <div class="layout-grid two-column">
+                <div>
+                    <h3>🔑 API Configuration</h3>
+                    <div class="box">
+                        <h4>Fal.ai</h4>
+                        <input class="input-field" type="password" placeholder="API Key" value="••••••••••••">
+                        <div style="display: flex; gap: 5px; margin-top: 10px;">
+                            <button class="button secondary">Test</button>
+                            <button class="button secondary">Show/Hide</button>
+                            <span style="color: green; padding: 10px;">✓ Connected</span>
+                        </div>
+                    </div>
+                    
+                    <div class="box" style="margin-top: 10px;">
+                        <h4>Replicate</h4>
+                        <input class="input-field" type="password" placeholder="API Key" value="••••••••••••">
+                        <div style="display: flex; gap: 5px; margin-top: 10px;">
+                            <button class="button secondary">Test</button>
+                            <button class="button secondary">Show/Hide</button>
+                            <span style="color: green; padding: 10px;">✓ Connected</span>
+                        </div>
+                    </div>
+                    
+                    <div class="box" style="margin-top: 10px;">
+                        <h4>OpenAI</h4>
+                        <input class="input-field" type="password" placeholder="API Key">
+                        <div style="display: flex; gap: 5px; margin-top: 10px;">
+                            <button class="button secondary">Test</button>
+                            <button class="button secondary">Show/Hide</button>
+                            <span style="color: orange; padding: 10px;">○ Not configured</span>
+                        </div>
+                    </div>
+                    
+                    <div class="box" style="margin-top: 10px;">
+                        <h4>OpenRouter</h4>
+                        <input class="input-field" type="password" placeholder="API Key">
+                        <div style="display: flex; gap: 5px; margin-top: 10px;">
+                            <button class="button secondary">Test</button>
+                            <button class="button secondary">Show/Hide</button>
+                            <span style="color: orange; padding: 10px;">○ Not configured</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3>⚙️ Application Settings</h3>
+                    <div class="box">
+                        <h4>Storage</h4>
+                        <label>Image Storage Path:</label>
+                        <div style="display: flex; gap: 5px;">
+                            <input class="input-field" value="/home/user/ai-images/">
+                            <button class="button secondary">Browse</button>
+                        </div>
+                        
+                        <label style="margin-top: 10px; display: block;">Database Path:</label>
+                        <div style="display: flex; gap: 5px;">
+                            <input class="input-field" value="/home/user/ai-images/database.db">
+                            <button class="button secondary">Browse</button>
+                        </div>
+                        
+                        <div style="margin-top: 15px; padding: 10px; background: #f5f5f5; border-radius: 4px;">
+                            <p>Storage Used: 4.7 GB</p>
+                            <p>Total Images: 1,234</p>
+                            <button class="button secondary" style="margin-top: 10px;">Clean Up Old Files</button>
+                        </div>
+                    </div>
+                    
+                    <div class="box" style="margin-top: 10px;">
+                        <h4>Interface</h4>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" checked> Dark Mode</label>
+                            <label><input type="checkbox" checked> Show Generation Time</label>
+                            <label><input type="checkbox" checked> Auto-save Images</label>
+                            <label><input type="checkbox"> Confirm Before Delete</label>
+                            <label><input type="checkbox" checked> Enable Keyboard Shortcuts</label>
+                        </div>
+                    </div>
+                    
+                    <div class="box" style="margin-top: 10px;">
+                        <h4>Performance</h4>
+                        <label>Max Concurrent Generations:</label>
+                        <input class="input-field" type="number" value="3">
+                        
+                        <label>Image Cache Size (MB):</label>
+                        <input class="input-field" type="number" value="500">
+                        
+                        <label>History Limit:</label>
+                        <input class="input-field" type="number" value="100">
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; text-align: center;">
+                <button class="button">💾 Save All Settings</button>
+                <button class="button secondary">🔄 Reset to Defaults</button>
+                <button class="button secondary">📤 Export Settings</button>
+                <button class="button secondary">📥 Import Settings</button>
+            </div>
+        </div>
+        
+        <!-- Gallery/Comparison View -->
+        <h2>View 5: Gallery & Comparison Mode</h2>
+        <div class="wireframe-section">
+            <div class="toolbar">
+                <div style="display: flex; gap: 10px;">
+                    <select class="input-field" style="width: 150px;">
+                        <option>All Images</option>
+                        <option>Favorites</option>
+                        <option>By Project</option>
+                        <option>By Model</option>
+                    </select>
+                    <select class="input-field" style="width: 150px;">
+                        <option>Date (Newest)</option>
+                        <option>Date (Oldest)</option>
+                        <option>Rating</option>
+                        <option>Model</option>
+                    </select>
+                    <input type="search" placeholder="Search by prompt, tag..." style="padding: 5px; width: 300px;">
+                </div>
+                <div>
+                    <button class="button secondary">🔲 Select Mode</button>
+                    <button class="button secondary">⚖️ Compare</button>
+                    <button class="button secondary">📤 Export Selected</button>
+                </div>
+            </div>
+            
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                    <div class="gallery-item-image" style="height: 200px;">
+                        <div style="position: absolute; top: 5px; right: 5px;">
+                            <button style="background: white; border: none; padding: 5px;">⭐</button>
+                        </div>
+                        Image 1
+                    </div>
+                    <div class="gallery-item-info">
+                        <strong>SDXL</strong> • 2 hours ago
+                        <div style="margin-top: 5px;">
+                            <span class="tag">Project: Characters</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="gallery-item">
+                    <div class="gallery-item-image" style="height: 200px;">
+                        <div style="position: absolute; top: 5px; right: 5px;">
+                            <button style="background: gold; border: none; padding: 5px;">⭐</button>
+                        </div>
+                        Image 2
+                    </div>
+                    <div class="gallery-item-info">
+                        <strong>DALL-E 3</strong> • 3 hours ago
+                        <div style="margin-top: 5px;">
+                            <span class="tag">Favorite</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- More gallery items... -->
+                <div class="gallery-item">
+                    <div class="gallery-item-image" style="height: 200px;">Image 3</div>
+                    <div class="gallery-item-info">
+                        <strong>Flux</strong> • Yesterday
+                    </div>
+                </div>
+                
+                <div class="gallery-item">
+                    <div class="gallery-item-image" style="height: 200px;">Image 4</div>
+                    <div class="gallery-item-info">
+                        <strong>SD 1.5</strong> • Yesterday
+                    </div>
+                </div>
+                
+                <div class="gallery-item">
+                    <div class="gallery-item-image" style="height: 200px;">Image 5</div>
+                    <div class="gallery-item-info">
+                        <strong>SDXL</strong> • 2 days ago
+                    </div>
+                </div>
+                
+                <div class="gallery-item">
+                    <div class="gallery-item-image" style="height: 200px;">Image 6</div>
+                    <div class="gallery-item-info">
+                        <strong>Midjourney</strong> • 2 days ago
+                    </div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="button secondary">Load More</button>
+            </div>
+        </div>
+        
+        <!-- Comparison Modal -->
+        <h2>View 6: Comparison Modal</h2>
+        <div class="wireframe-section">
+            <h3 style="margin-bottom: 20px;">⚖️ Image Comparison</h3>
+            
+            <div class="layout-grid two-column">
+                <div class="box" style="text-align: center;">
+                    <h4>Image A</h4>
+                    <div style="height: 300px; background: #e0e0e0; display: flex; align-items: center; justify-content: center; margin: 10px 0;">
+                        [Image Preview]
+                    </div>
+                    <div style="background: #f5f5f5; padding: 10px; border-radius: 4px; text-align: left;">
+                        <p><strong>Model:</strong> SDXL</p>
+                        <p><strong>Size:</strong> 1024x1024</p>
+                        <p><strong>CFG:</strong> 7.5</p>
+                        <p><strong>Steps:</strong> 20</p>
+                        <p><strong>Sampler:</strong> DPM++ 2M Karras</p>
+                    </div>
+                    <button class="button" style="margin-top: 10px;">Select as Winner</button>
+                </div>
+                
+                <div class="box" style="text-align: center;">
+                    <h4>Image B</h4>
+                    <div style="height: 300px; background: #e0e0e0; display: flex; align-items: center; justify-content: center; margin: 10px 0;">
+                        [Image Preview]
+                    </div>
+                    <div style="background: #f5f5f5; padding: 10px; border-radius: 4px; text-align: left;">
+                        <p><strong>Model:</strong> DALL-E 3</p>
+                        <p><strong>Size:</strong> 1024x1024</p>
+                        <p><strong>Quality:</strong> HD</p>
+                        <p><strong>Style:</strong> Vivid</p>
+                        <p><strong>-</strong></p>
+                    </div>
+                    <button class="button" style="margin-top: 10px;">Select as Winner</button>
+                </div>
+            </div>
+            
+            <div class="box" style="margin-top: 20px;">
+                <h4>Shared Prompt:</h4>
+                <p style="background: #f5f5f5; padding: 10px; border-radius: 4px;">
+                    "A majestic mountain landscape at sunset with dramatic clouds and golden light reflecting off snow-capped peaks"
+                </p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="button secondary">Add More Images to Compare</button>
+                <button class="button secondary">Close Comparison</button>
+            </div>
+        </div>
+        
+        <!-- Keyboard Shortcuts Reference -->
+        <h2>Additional UI Elements</h2>
+        <div class="wireframe-section">
+            <h3>⌨️ Keyboard Shortcuts</h3>
+            <div class="layout-grid two-column">
+                <div>
+                    <p><kbd>Ctrl</kbd> + <kbd>Enter</kbd> - Generate Image</p>
+                    <p><kbd>Ctrl</kbd> + <kbd>S</kbd> - Save Current Image</p>
+                    <p><kbd>Ctrl</kbd> + <kbd>D</kbd> - Duplicate Settings</p>
+                    <p><kbd>Ctrl</kbd> + <kbd>R</kbd> - Random Seed</p>
+                </div>
+                <div>
+                    <p><kbd>Ctrl</kbd> + <kbd>Z</kbd> - Undo Last Change</p>
+                    <p><kbd>Ctrl</kbd> + <kbd>F</kbd> - Focus Search</p>
+                    <p><kbd>Ctrl</kbd> + <kbd>P</kbd> - Open Projects</p>
+                    <p><kbd>Esc</kbd> - Close Modal</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="wireframe-section">
+            <h3>📱 Status Bar</h3>
+            <div style="background: #333; color: white; padding: 10px; border-radius: 4px; display: flex; justify-content: space-between;">
+                <div>
+                    <span style="margin-right: 20px;">✅ All Systems Operational</span>
+                    <span style="margin-right: 20px;">📊 1,234 Total Generations</span>
+                    <span>⚡ Last Generation: 2.3s</span>
+                </div>
+                <div>
+                    <span style="margin-right: 20px;">🔄 Auto-save: ON</span>
+                    <span>💾 4.7 GB Used</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

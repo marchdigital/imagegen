@@ -1,0 +1,435 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gallery - AI Image Generator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background: #1a1a1a;
+            color: white;
+        }
+        
+        .header {
+            background: #242424;
+            padding: 20px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: #242424;
+            margin: 20px;
+            border-radius: 8px;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 10px;
+        }
+        
+        select, input {
+            padding: 8px 12px;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: white;
+        }
+        
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .gallery-item {
+            background: #242424;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
+        }
+        
+        .gallery-item:hover {
+            transform: scale(1.02);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+        
+        .gallery-info {
+            padding: 15px;
+        }
+        
+        .gallery-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .tag {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #333;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+        
+        .favorite-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            border: none;
+            color: white;
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        
+        .favorite-btn.active {
+            color: gold;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .btn-secondary {
+            background: #555;
+        }
+        
+        .selection-mode {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #242424;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .selection-mode.active {
+            display: block;
+        }
+        
+        .checkbox {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 20px;
+            height: 20px;
+            display: none;
+        }
+        
+        .selection-mode-active .checkbox {
+            display: block;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: #242424;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow: auto;
+        }
+        
+        .image-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .detail-image {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+        
+        .detail-info {
+            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 8px;
+        }
+        
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-btn">← Back to Generator</a>
+    
+    <div class="header">
+        <h1>🖼️ Gallery</h1>
+    </div>
+    
+    <div class="toolbar">
+        <div class="filters">
+            <select id="filter-type">
+                <option value="all">All Images</option>
+                <option value="favorites">Favorites</option>
+                <option value="today">Today</option>
+                <option value="week">This Week</option>
+            </select>
+            
+            <select id="sort-by">
+                <option value="date-desc">Date (Newest)</option>
+                <option value="date-asc">Date (Oldest)</option>
+                <option value="model">By Model</option>
+            </select>
+            
+            <input type="search" id="search" placeholder="Search prompts...">
+        </div>
+        
+        <div class="actions">
+            <button class="btn btn-secondary" onclick="toggleSelectionMode()">
+                🔲 Select
+            </button>
+            <button class="btn btn-secondary" onclick="compareSelected()">
+                ⚖️ Compare
+            </button>
+            <button class="btn" onclick="exportSelected()">
+                📤 Export
+            </button>
+        </div>
+    </div>
+    
+    <div class="gallery-grid" id="gallery">
+        <!-- Gallery items will be loaded here -->
+    </div>
+    
+    <div class="selection-mode" id="selection-panel">
+        <p><span id="selected-count">0</span> selected</p>
+        <button class="btn" onclick="downloadSelected()">Download Selected</button>
+        <button class="btn btn-secondary" onclick="deleteSelected()">Delete Selected</button>
+        <button class="btn btn-secondary" onclick="cancelSelection()">Cancel</button>
+    </div>
+    
+    <!-- Image Detail Modal -->
+    <div class="modal" id="detail-modal">
+        <div class="modal-content">
+            <button onclick="closeModal()" style="float: right; background: none; border: none; color: white; font-size: 24px; cursor: pointer;">×</button>
+            <div class="image-details">
+                <div>
+                    <img id="detail-image" class="detail-image" src="" alt="">
+                </div>
+                <div class="detail-info">
+                    <h2>Image Details</h2>
+                    <div id="detail-metadata">
+                        <!-- Metadata will be loaded here -->
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button class="btn" onclick="regenerateWithSameParams()">
+                            🔄 Regenerate
+                        </button>
+                        <button class="btn btn-secondary" onclick="copyPrompt()">
+                            📋 Copy Prompt
+                        </button>
+                        <button class="btn btn-secondary" onclick="downloadImage()">
+                            💾 Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let galleryImages = [];
+        let selectedImages = [];
+        let selectionMode = false;
+        let currentImage = null;
+        
+        async function loadGallery() {
+            const filter = document.getElementById('filter-type').value;
+            const response = await fetch(`/api/gallery/list?limit=100&filter=${filter}`);
+            const data = await response.json();
+            
+            galleryImages = data.images || [];
+            displayGallery(galleryImages);
+        }
+        
+        function displayGallery(images) {
+            const gallery = document.getElementById('gallery');
+            gallery.innerHTML = images.map(img => `
+                <div class="gallery-item" data-id="${img.id}" onclick="handleImageClick(${img.id})">
+                    <input type="checkbox" class="checkbox" onclick="event.stopPropagation(); toggleSelection(${img.id})">
+                    <button class="favorite-btn ${img.favorite ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite(${img.id})">
+                        ${img.favorite ? '⭐' : '☆'}
+                    </button>
+                    <img src="/storage/images/${img.thumbnail || img.filename}" alt="">
+                    <div class="gallery-info">
+                        <p style="font-size: 14px; opacity: 0.8;">${(img.prompt || '').substring(0, 80)}...</p>
+                        <div class="gallery-meta">
+                            <div>
+                                <span class="tag">${img.model || 'Unknown'}</span>
+                            </div>
+                            <span style="font-size: 12px; opacity: 0.6;">
+                                ${new Date(img.created_at).toLocaleDateString()}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function handleImageClick(imageId) {
+            if (selectionMode) {
+                toggleSelection(imageId);
+            } else {
+                showImageDetails(imageId);
+            }
+        }
+        
+        function showImageDetails(imageId) {
+            const image = galleryImages.find(img => img.id === imageId);
+            if (!image) return;
+            
+            currentImage = image;
+            document.getElementById('detail-image').src = `/storage/images/${image.filename}`;
+            document.getElementById('detail-metadata').innerHTML = `
+                <p><strong>Prompt:</strong> ${image.prompt}</p>
+                <p><strong>Negative:</strong> ${image.params?.negative_prompt || 'None'}</p>
+                <p><strong>Model:</strong> ${image.model}</p>
+                <p><strong>Size:</strong> ${image.params?.width || 0} x ${image.params?.height || 0}</p>
+                <p><strong>Steps:</strong> ${image.params?.steps || 0}</p>
+                <p><strong>CFG Scale:</strong> ${image.params?.cfg_scale || 0}</p>
+                <p><strong>Seed:</strong> ${image.params?.seed || 'Random'}</p>
+                <p><strong>Created:</strong> ${new Date(image.created_at).toLocaleString()}</p>
+            `;
+            
+            document.getElementById('detail-modal').style.display = 'flex';
+        }
+        
+        function closeModal() {
+            document.getElementById('detail-modal').style.display = 'none';
+        }
+        
+        async function toggleFavorite(imageId) {
+            const response = await fetch(`/api/gallery/${imageId}/favorite`, { method: 'POST' });
+            const result = await response.json();
+            
+            const image = galleryImages.find(img => img.id === imageId);
+            if (image) {
+                image.favorite = result.is_favorite;
+            }
+            displayGallery(galleryImages);
+        }
+        
+        function toggleSelectionMode() {
+            selectionMode = !selectionMode;
+            document.body.classList.toggle('selection-mode-active');
+            document.getElementById('selection-panel').classList.toggle('active');
+            
+            if (!selectionMode) {
+                selectedImages = [];
+                document.getElementById('selected-count').textContent = '0';
+            }
+        }
+        
+        function toggleSelection(imageId) {
+            const index = selectedImages.indexOf(imageId);
+            if (index > -1) {
+                selectedImages.splice(index, 1);
+            } else {
+                selectedImages.push(imageId);
+            }
+            document.getElementById('selected-count').textContent = selectedImages.length;
+        }
+        
+        function copyPrompt() {
+            if (currentImage) {
+                navigator.clipboard.writeText(currentImage.prompt);
+                alert('Prompt copied to clipboard!');
+            }
+        }
+        
+        function downloadImage() {
+            if (currentImage) {
+                const a = document.createElement('a');
+                a.href = `/storage/images/${currentImage.filename}`;
+                a.download = currentImage.filename;
+                a.click();
+            }
+        }
+        
+        function compareSelected() {
+            if (selectedImages.length < 2) {
+                alert('Please select at least 2 images to compare');
+                return;
+            }
+            // Implement comparison view
+            const images = selectedImages.map(id => galleryImages.find(img => img.id === id));
+            // Open comparison modal with selected images
+        }
+        
+        // Search functionality
+        document.getElementById('search').oninput = (e) => {
+            const query = e.target.value.toLowerCase();
+            const filtered = galleryImages.filter(img => 
+                (img.prompt || '').toLowerCase().includes(query)
+            );
+            displayGallery(filtered);
+        };
+        
+        // Sort functionality
+        document.getElementById('sort-by').onchange = (e) => {
+            const sortBy = e.target.value;
+            let sorted = [...galleryImages];
+            
+            if (sortBy === 'date-desc') {
+                sorted.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            } else if (sortBy === 'date-asc') {
+                sorted.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            } else if (sortBy === 'model') {
+                sorted.sort((a, b) => (a.model || '').localeCompare(b.model || ''));
+            }
+            
+            displayGallery(sorted);
+        };
+        
+        // Load gallery on page load
+        loadGallery();
+    </script>
+</body>
+</html>

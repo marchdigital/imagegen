@@ -1,0 +1,71 @@
+﻿<!-- Add this to your frontend HTML in the center panel, replacing the existing simple controls -->
+<div class="advanced-controls" style="margin-top: 20px;">
+    <details open style="background: #2a2a2a; border-radius: 4px; padding: 10px; margin-bottom: 10px;">
+        <summary style="cursor: pointer; padding: 10px; font-weight: bold;">⚡ Advanced Parameters</summary>
+        
+        <div style="padding: 10px;">
+            <!-- Sampling Steps -->
+            <div class="slider-group" style="margin: 15px 0;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <label>Sampling Steps</label>
+                    <span id="steps-value">20</span>
+                </div>
+                <input type="range" id="steps" min="1" max="50" value="20" 
+                       style="width: 100%;" 
+                       oninput="document.getElementById('steps-value').textContent = this.value">
+            </div>
+            
+            <!-- CFG Scale -->
+            <div class="slider-group" style="margin: 15px 0;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <label>CFG Scale</label>
+                    <span id="cfg-value">7.5</span>
+                </div>
+                <input type="range" id="cfg-scale" min="1" max="20" step="0.5" value="7.5"
+                       style="width: 100%;"
+                       oninput="document.getElementById('cfg-value').textContent = this.value">
+            </div>
+            
+            <!-- Seed -->
+            <div class="form-group">
+                <label>Seed (-1 for random)</label>
+                <input type="number" id="seed" value="-1" style="width: 100%;">
+            </div>
+            
+            <!-- Sampler -->
+            <div class="form-group">
+                <label>Sampler</label>
+                <select id="sampler" style="width: 100%;">
+                    <option value="DPM++ 2M Karras">DPM++ 2M Karras</option>
+                    <option value="Euler a">Euler a</option>
+                    <option value="DDIM">DDIM</option>
+                    <option value="LMS">LMS</option>
+                </select>
+            </div>
+        </div>
+    </details>
+    
+    <!-- Aspect Ratio Presets -->
+    <div class="form-group">
+        <label>Aspect Ratio</label>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px;">
+            <button class="aspect-btn" data-width="1024" data-height="1024" style="padding: 8px; background: #2a2a2a; border: 1px solid #444; border-radius: 4px; color: white; cursor: pointer;">1:1</button>
+            <button class="aspect-btn" data-width="1344" data-height="768" style="padding: 8px; background: #2a2a2a; border: 1px solid #444; border-radius: 4px; color: white; cursor: pointer;">16:9</button>
+            <button class="aspect-btn" data-width="768" data-height="1344" style="padding: 8px; background: #2a2a2a; border: 1px solid #444; border-radius: 4px; color: white; cursor: pointer;">9:16</button>
+            <button class="aspect-btn" data-width="1024" data-height="768" style="padding: 8px; background: #2a2a2a; border: 1px solid #444; border-radius: 4px; color: white; cursor: pointer;">4:3</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Add aspect ratio button handlers
+document.querySelectorAll('.aspect-btn').forEach(btn => {
+    btn.onclick = function() {
+        document.getElementById('width').value = this.dataset.width;
+        document.getElementById('height').value = this.dataset.height;
+        // Highlight selected
+        document.querySelectorAll('.aspect-btn').forEach(b => b.style.background = '#2a2a2a');
+        this.style.background = '#4CAF50';
+    };
+});
+</script>

@@ -1,0 +1,343 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Settings - AI Image Generator</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background: #1a1a1a;
+            color: white;
+            padding: 20px;
+        }
+        
+        .settings-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .settings-section {
+            background: #242424;
+            padding: 25px;
+            border-radius: 8px;
+        }
+        
+        h2 {
+            margin-top: 0;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #444;
+        }
+        
+        .form-group {
+            margin: 20px 0;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #aaa;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: white;
+        }
+        
+        .api-key-group {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        
+        .api-status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin-left: 10px;
+            font-size: 12px;
+        }
+        
+        .status-connected {
+            background: #4CAF50;
+        }
+        
+        .status-disconnected {
+            background: #f44336;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .btn-secondary {
+            background: #555;
+        }
+        
+        .checkbox-group {
+            margin: 10px 0;
+        }
+        
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+        
+        .checkbox-group input {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        .storage-info {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        
+        .storage-bar {
+            background: #333;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .storage-used {
+            background: #4CAF50;
+            height: 100%;
+            transition: width 0.3s;
+        }
+    </style>
+	<script src="/static/js/presets.js"></script>
+<script src="/static/js/comparison.js"></script>
+</head>
+<body>
+    <div class="settings-container">
+        <h1>⚙️ Settings</h1>
+        
+        <div class="settings-grid">
+            <!-- API Configuration -->
+            <div class="settings-section">
+                <h2>🔑 API Configuration</h2>
+                
+                <div class="api-key-group">
+                    <h4>Fal.ai</h4>
+                    <input type="password" id="fal-key" placeholder="Enter API Key">
+                    <button class="btn btn-secondary" onclick="testAPI('fal')">Test</button>
+                    <span class="api-status status-disconnected" id="fal-status">Not Set</span>
+                </div>
+                
+                <div class="api-key-group">
+                    <h4>Replicate</h4>
+                    <input type="password" id="replicate-key" placeholder="Enter API Key">
+                    <button class="btn btn-secondary" onclick="testAPI('replicate')">Test</button>
+                    <span class="api-status status-disconnected" id="replicate-status">Not Set</span>
+                </div>
+                
+                <div class="api-key-group">
+                    <h4>OpenAI</h4>
+                    <input type="password" id="openai-key" placeholder="Enter API Key">
+                    <button class="btn btn-secondary" onclick="testAPI('openai')">Test</button>
+                    <span class="api-status status-disconnected" id="openai-status">Not Set</span>
+                </div>
+                
+                <button class="btn" onclick="saveAPIKeys()">💾 Save API Keys</button>
+            </div>
+            
+            <!-- Application Settings -->
+            <div class="settings-section">
+                <h2>🎨 Application Settings</h2>
+                
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" id="dark-mode" checked>
+                        Dark Mode
+                    </label>
+                    <label>
+                        <input type="checkbox" id="auto-save" checked>
+                        Auto-save Generated Images
+                    </label>
+                    <label>
+                        <input type="checkbox" id="show-time" checked>
+                        Show Generation Time
+                    </label>
+                    <label>
+                        <input type="checkbox" id="confirm-delete">
+                        Confirm Before Delete
+                    </label>
+                    <label>
+                        <input type="checkbox" id="shortcuts" checked>
+                        Enable Keyboard Shortcuts
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label>Default Image Size</label>
+                    <select id="default-size">
+                        <option value="512x512">512 x 512</option>
+                        <option value="768x768">768 x 768</option>
+                        <option value="1024x1024" selected>1024 x 1024</option>
+                        <option value="1536x1536">1536 x 1536</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>History Limit</label>
+                    <input type="number" id="history-limit" value="100" min="10" max="1000">
+                </div>
+                
+                <button class="btn" onclick="saveSettings()">💾 Save Settings</button>
+            </div>
+            
+            <!-- Storage Settings -->
+            <div class="settings-section">
+                <h2>💾 Storage</h2>
+                
+                <div class="storage-info">
+                    <p>Storage Location: <code>./storage/images</code></p>
+                    <p>Total Images: <span id="total-images">0</span></p>
+                    <p>Storage Used: <span id="storage-used">0 MB</span> / 10 GB</p>
+                    <div class="storage-bar">
+                        <div class="storage-used" id="storage-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-secondary" onclick="cleanupStorage()">🧹 Clean Up Old Files</button>
+                <button class="btn btn-secondary" onclick="exportData()">📤 Export All Data</button>
+                <button class="btn btn-secondary" onclick="importData()">📥 Import Data</button>
+            </div>
+            
+            <!-- Performance Settings -->
+            <div class="settings-section">
+                <h2>⚡ Performance</h2>
+                
+                <div class="form-group">
+                    <label>Max Concurrent Generations</label>
+                    <input type="number" id="max-concurrent" value="1" min="1" max="5">
+                </div>
+                
+                <div class="form-group">
+                    <label>Image Cache Size (MB)</label>
+                    <input type="number" id="cache-size" value="500" min="100" max="5000">
+                </div>
+                
+                <div class="form-group">
+                    <label>Request Timeout (seconds)</label>
+                    <input type="number" id="timeout" value="120" min="30" max="300">
+                </div>
+                
+                <button class="btn" onclick="savePerformanceSettings()">💾 Save Performance Settings</button>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 40px;">
+            <button class="btn btn-secondary" onclick="resetToDefaults()">🔄 Reset All to Defaults</button>
+            <a href="/" class="btn" style="text-decoration: none; display: inline-block; margin-left: 10px;">← Back to Generator</a>
+        </div>
+    </div>
+    
+    <script>
+        // Load current settings
+        async function loadSettings() {
+            try {
+                const response = await fetch('/api/settings');
+                const settings = await response.json();
+                
+                // Apply settings to UI
+                if (settings.darkMode !== undefined) {
+                    document.getElementById('dark-mode').checked = settings.darkMode;
+                }
+                if (settings.autoSave !== undefined) {
+                    document.getElementById('auto-save').checked = settings.autoSave;
+                }
+                
+                // Load storage info
+                loadStorageInfo();
+            } catch (error) {
+                console.error('Failed to load settings:', error);
+            }
+        }
+        
+        async function loadStorageInfo() {
+            try {
+                const response = await fetch('/api/gallery/list?limit=1000');
+                const data = await response.json();
+                
+                document.getElementById('total-images').textContent = data.images.length;
+                
+                // Calculate approximate storage (assume 2MB per image average)
+                const storageMB = data.images.length * 2;
+                document.getElementById('storage-used').textContent = storageMB + ' MB';
+                
+                const storagePercent = (storageMB / 10240) * 100; // 10GB limit
+                document.getElementById('storage-bar').style.width = storagePercent + '%';
+            } catch (error) {
+                console.error('Failed to load storage info:', error);
+            }
+        }
+        
+        function saveAPIKeys() {
+            const keys = {
+                fal: document.getElementById('fal-key').value,
+                replicate: document.getElementById('replicate-key').value,
+                openai: document.getElementById('openai-key').value
+            };
+            
+            // In production, this would save to backend securely
+            localStorage.setItem('api_keys', JSON.stringify(keys));
+            alert('API keys saved successfully!');
+        }
+        
+        function saveSettings() {
+            const settings = {
+                darkMode: document.getElementById('dark-mode').checked,
+                autoSave: document.getElementById('auto-save').checked,
+                showTime: document.getElementById('show-time').checked,
+                confirmDelete: document.getElementById('confirm-delete').checked,
+                shortcuts: document.getElementById('shortcuts').checked,
+                defaultSize: document.getElementById('default-size').value,
+                historyLimit: document.getElementById('history-limit').value
+            };
+            
+            localStorage.setItem('app_settings', JSON.stringify(settings));
+            alert('Settings saved successfully!');
+        }
+        
+        function testAPI(provider) {
+            // Test API connection
+            const statusEl = document.getElementById(`${provider}-status`);
+            statusEl.textContent = 'Testing...';
+            statusEl.className = 'api-status';
+            
+            // Simulate API test
+            setTimeout(() => {
+                statusEl.textContent = 'Connected';
+                statusEl.className = 'api-status status-connected';
+            }, 1000);
+        }
+        
+        // Load settings on page load
+        loadSettings();
+    </script>
+</body>
+</html>

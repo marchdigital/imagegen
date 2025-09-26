@@ -1,0 +1,60 @@
+﻿{
+  "presets": [
+    {
+      "id": "photorealistic",
+      "name": "Photorealistic",
+      "prompt_suffix": ", photorealistic, highly detailed, professional photography, 8k uhd, dslr, high quality, film grain",
+      "negative_prompt": "cartoon, painting, illustration, drawing, art, sketch, anime, blurry, distorted",
+      "cfg_scale": 7,
+      "steps": 30
+    },
+    {
+      "id": "anime",
+      "name": "Anime Style", 
+      "prompt_suffix": ", anime style, manga, detailed anime art, vibrant colors, studio anime, high quality",
+      "negative_prompt": "photo, realistic, 3d render, western cartoon, blurry, low quality",
+      "cfg_scale": 7,
+      "steps": 25
+    },
+    {
+      "id": "oil_painting",
+      "name": "Oil Painting",
+      "prompt_suffix": ", oil painting, classical art, brush strokes, canvas texture, masterpiece, museum quality",
+      "negative_prompt": "photo, digital art, 3d, modern, cartoon, anime",
+      "cfg_scale": 8,
+      "steps": 35
+    },
+    {
+      "id": "3d_render",
+      "name": "3D Render",
+      "prompt_suffix": ", 3d render, octane render, cinema 4d, blender, photorealistic 3d, ray tracing, 8k",
+      "negative_prompt": "2d, flat, painting, drawing, sketch, anime, cartoon",
+      "cfg_scale": 7.5,
+      "steps": 25
+    },
+    {
+      "id": "sketch",
+      "name": "Pencil Sketch",
+      "prompt_suffix": ", pencil sketch, detailed drawing, graphite art, black and white, artistic sketch",
+      "negative_prompt": "color, photo, painting, 3d, digital color",
+      "cfg_scale": 6,
+      "steps": 20
+    },
+    {
+      "id": "cyberpunk",
+      "name": "Cyberpunk",
+      "prompt_suffix": ", cyberpunk style, neon lights, futuristic, high tech, dystopian, blade runner style",
+      "negative_prompt": "medieval, rustic, natural, primitive, ancient",
+      "cfg_scale": 8,
+      "steps": 30
+    },
+    {
+      "id": "fantasy",
+      "name": "Fantasy Art",
+      "prompt_suffix": ", fantasy art, magical, epic fantasy, detailed fantasy illustration, mystical",
+      "negative_prompt": "modern, realistic, photo, mundane, everyday",
+      "cfg_scale": 8.5,
+      "steps": 35
+    }
+  ]
+}

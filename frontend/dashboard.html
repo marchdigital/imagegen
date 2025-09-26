@@ -1,0 +1,179 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - AI Image Generator</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background: #1a1a1a;
+            color: white;
+            padding: 20px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .chart-container {
+            background: #242424;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .usage-bar {
+            background: #333;
+            height: 30px;
+            border-radius: 4px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .usage-fill {
+            height: 100%;
+            background: #4CAF50;
+            transition: width 0.3s;
+        }
+        
+        h2 {
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+    </style>
+	<script src="/static/js/presets.js"></script>
+<script src="/static/js/comparison.js"></script>
+</head>
+<body>
+    <a href="/" class="back-btn">← Back to Generator</a>
+    
+    <h1>📊 Dashboard</h1>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Generations</div>
+            <div class="stat-number" id="total-gen">0</div>
+        </div>
+        
+        <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+            <div class="stat-label">Today</div>
+            <div class="stat-number" id="today-gen">0</div>
+        </div>
+        
+        <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+            <div class="stat-label">This Week</div>
+            <div class="stat-number" id="week-gen">0</div>
+        </div>
+        
+        <div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+            <div class="stat-label">Favorites</div>
+            <div class="stat-number" id="fav-count">0</div>
+        </div>
+    </div>
+    
+    <div class="chart-container">
+        <h2>Provider Usage</h2>
+        <div id="provider-usage"></div>
+    </div>
+    
+    <div class="chart-container">
+        <h2>Model Popularity</h2>
+        <div id="model-usage"></div>
+    </div>
+    
+    <div class="chart-container">
+        <h2>Storage Information</h2>
+        <p>Total Images: <span id="total-images">0</span></p>
+        <p>Storage Used: <span id="storage-used">0 MB</span></p>
+        <div class="usage-bar">
+            <div class="usage-fill" id="storage-bar" style="width: 0%"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Load statistics
+        async function loadStats() {
+            try {
+                // Load from metadata
+                const response = await fetch('/api/gallery/list?limit=1000');
+                const data = await response.json();
+                
+                // Calculate stats
+                const images = data.images || [];
+                const today = new Date().toDateString();
+                const todayImages = images.filter(img => 
+                    new Date(img.created_at).toDateString() === today
+                );
+                
+                document.getElementById('total-gen').textContent = images.length;
+                document.getElementById('today-gen').textContent = todayImages.length;
+                document.getElementById('fav-count').textContent = 
+                    images.filter(img => img.favorite).length;
+                
+                // Model usage
+                const modelCounts = {};
+                images.forEach(img => {
+                    modelCounts[img.model] = (modelCounts[img.model] || 0) + 1;
+                });
+                
+                const modelHtml = Object.entries(modelCounts).map(([model, count]) => {
+                    const percentage = (count / images.length * 100).toFixed(1);
+                    return `
+                        <div style="margin: 10px 0;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>${model}</span>
+                                <span>${count} (${percentage}%)</span>
+                            </div>
+                            <div class="usage-bar">
+                                <div class="usage-fill" style="width: ${percentage}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                document.getElementById('model-usage').innerHTML = modelHtml;
+                
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+        
+        loadStats();
+        // Refresh every 30 seconds
+        setInterval(loadStats, 30000);
+    </script>
+</body>
+</html>

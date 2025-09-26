@@ -1,0 +1,19 @@
+﻿// Update the switchTab function in your main index.html
+function switchTab(view) {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    if (view === 'generator') {
+        // Stay on current page
+        document.querySelector('[data-view="generator"]').classList.add('active');
+    } else if (view === 'gallery') {
+        window.location.href = '/static/gallery.html';
+    } else if (view === 'dashboard') {
+        window.location.href = '/static/dashboard.html';
+    } else if (view === 'projects') {
+        window.location.href = '/static/projects.html';
+    } else if (view === 'settings') {
+        window.location.href = '/static/settings.html';
+    }
+}

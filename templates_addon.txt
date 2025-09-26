@@ -1,0 +1,24 @@
+const promptTemplates = {
+    "Portraits": [
+        "portrait of a {subject}, dramatic lighting, oil painting style",
+        "professional photograph of {subject}, studio lighting, 8k, ultra detailed",
+        "cyberpunk portrait of {subject}, neon lights, futuristic"
+    ],
+    "Landscapes": [
+        "beautiful {location} landscape, golden hour, photorealistic",
+        "{location} in style of Studio Ghibli, anime art",
+        "fantasy {location}, epic scale, detailed environment art"
+    ],
+    "Art Styles": [
+        "{subject} in Van Gogh style, oil painting, vibrant colors",
+        "{subject}, watercolor painting, soft colors, artistic",
+        "{subject}, pencil sketch, detailed drawing, black and white"
+    ]
+};
+
+// Add template selector to your UI
+function applyTemplate(template) {
+    const prompt = document.getElementById("prompt");
+    prompt.value = template;
+    prompt.focus();
+}

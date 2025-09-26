@@ -1,0 +1,1 @@
+print('Desktop app')
