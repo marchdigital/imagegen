@@ -3,31 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Photoshoot - E-commerce & Marketing</title>
+    <title>Product Photoshoot - Professional Product Photography</title>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,sans-serif;background:#0a0a0a;color:#e0e0e0;padding:20px}
-        .container{max-width:1600px;margin:0 auto}
-        h1{color:#fff;margin-bottom:20px;font-size:32px;background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-        h2{color:#fff;margin:30px 0 20px;font-size:24px;padding:15px;background:linear-gradient(135deg,#1a1a2e,#16213e);border-left:4px solid #667eea;border-radius:4px}
-        .model-section{background:#1a1a1a;border:1px solid #333;border-radius:12px;padding:25px;margin-bottom:30px}
-        .layout-grid{display:grid;gap:20px}
-        .two-column{grid-template-columns:1fr 1fr}
-        .three-column{grid-template-columns:1fr 1fr 1fr}
-        .box{border:1px solid #333;border-radius:8px;padding:20px;background:#0f0f0f}
-        .input-group{margin-bottom:15px}
-        .input-group label{display:block;margin-bottom:8px;color:#b0b0b0;font-size:14px}
-        .input-field{width:100%;padding:10px;border:1px solid #333;background:#0a0a0a;color:#e0e0e0;border-radius:6px;font-size:14px}
-        .multi-upload-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:15px}
-        .upload-item{position:relative;border:1px solid #333;border-radius:8px;padding:20px;background:#0a0a0a;min-height:150px;display:flex;align-items:center;justify-content:center;flex-direction:column}
-        .upload-item.filled{background:#1a1a1a;border-color:#667eea}
-        .remove-btn{position:absolute;top:5px;right:5px;background:#ff4444;color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-        .tag{display:inline-block;padding:6px 12px;background:#2a2a2a;border:1px solid #444;border-radius:20px;margin:4px;font-size:12px;cursor:pointer}
-        .button{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;padding:12px 24px;border-radius:6px;cursor:pointer;font-weight:600}
-        .nav-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-        .nav-card{cursor:pointer;border:1px solid #333;background:#0f0f0f;padding:16px;border-radius:8px}
-        .nav-card a{color:inherit;text-decoration:none;display:block}
-        .result{margin-top:20px}
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background: #0a0a0a; color: #e0e0e0; padding: 20px; }
+        .container { max-width: 1600px; margin: 0 auto; }
+        h1 { color: #ffffff; margin-bottom: 20px; font-size: 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        h2 { color: #ffffff; margin: 30px 0 20px 0; font-size: 24px; padding: 15px; background: linear-gradient(135deg, #1a1a2e, #16213e); border-left: 4px solid #667eea; border-radius: 4px; }
+        .model-section { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+        .model-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #333; }
+        .model-title { font-size: 20px; color: #ffffff; display: flex; align-items: center; gap: 10px; }
+        .model-badge { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .layout-grid { display: grid; gap: 20px; margin-bottom: 20px; }
+        .two-column { grid-template-columns: 1fr 1fr; }
+        .box { border: 1px solid #333; border-radius: 8px; padding: 20px; background: #0f0f0f; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 8px; color: #b0b0b0; font-size: 14px; font-weight: 500; }
+        .input-field { width: 100%; padding: 10px; border: 1px solid #333; background: #0a0a0a; color: #e0e0e0; border-radius: 6px; font-size: 14px; }
+        textarea.input-field { resize: vertical; min-height: 80px; }
+        .button { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .upload-zone { border: 2px dashed #444; border-radius: 8px; padding: 30px; text-align: center; background: #0a0a0a; cursor: pointer; transition: all 0.3s; }
+        .upload-zone:hover { border-color: #667eea; background: #111; }
+        .upload-zone.has-files { border-color: #4CAF50; background: #0a1a0a; }
+        .image-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 10px; }
+        .image-preview { position: relative; border: 1px solid #333; border-radius: 6px; overflow: hidden; aspect-ratio: 1; }
+        .image-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .remove-image { position: absolute; top: 5px; right: 5px; background: #ff4444; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 16px; }
+        .slider-group { margin: 15px 0; }
+        .slider-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .slider { width: 100%; height: 6px; border-radius: 3px; background: #333; outline: none; -webkit-appearance: none; }
+        .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #667eea; cursor: pointer; }
+        .result { margin-top: 20px; }
+        .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; }
+        .result img { width: 100%; border-radius: 8px; }
+        .note { color: #b0b0b0; font-size: 12px; margin-top: 8px; }
+        .nav-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .nav-card { cursor: pointer; border: 1px solid #333; background: #0f0f0f; padding: 16px; border-radius: 8px; transition: all 0.3s; }
+        .nav-card:hover { border-color: #667eea; transform: translateY(-2px); }
+        .nav-card a { color: inherit; text-decoration: none; display: block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -37,75 +52,287 @@
         <h2>Quick Model Selector</h2>
         <div class="model-section">
             <div class="nav-grid">
-                <div class="nav-card"><a href="/models/wan25"><h4>🎯 WAN-25 Preview</h4><p>Advanced image-to-image with multiple references</p></a></div>
-                <div class="nav-card"><a href="/models/qwen-edit"><h4>✏️ Qwen Edit Plus</h4><p>Smart image editing and object manipulation</p></a></div>
-                <div class="nav-card"><a href="/models/product-photoshoot"><h4>📸 Product Photoshoot</h4><p>Professional product photography generation</p></a></div>
+                <div class="nav-card"><a href="/models/wan25"><h4>🎯 WAN-25 Preview</h4><p class="note">Advanced text-to-image generation</p></a></div>
+                <div class="nav-card"><a href="/models/qwen-edit"><h4>✏️ Qwen Edit Plus</h4><p class="note">Smart image editing and object manipulation</p></a></div>
+                <div class="nav-card"><a href="/models/product-photoshoot"><h4>📸 Product Photoshoot</h4><p class="note">Professional product photography generation</p></a></div>
             </div>
         </div>
 
-        <h2>Product Photoshoot - E-commerce & Marketing</h2>
+        <h2>Product Photoshoot - Professional Product Photography</h2>
         <div class="model-section">
-            <div class="layout-grid two-column">
-                <div class="box">
-                    <h3>Product Setup</h3>
-                    <div class="input-group">
-                        <label>Product Images</label>
-                        <div id="product-images" class="multi-upload-grid">
-                            <div class="upload-item"><span>+ Front View</span></div>
-                            <div class="upload-item"><span>+ Side View</span></div>
-                            <div class="upload-item"><span>+ Back View</span></div>
-                            <div class="upload-item"><span>+ Detail Shot</span></div>
+            <div class="model-header">
+                <div class="model-title"><span>📸 Product Photoshoot</span><span class="model-badge">PRO</span></div>
+            </div>
+
+            <form id="product-form" enctype="multipart/form-data">
+                <div class="layout-grid two-column">
+                    <div class="box">
+                        <h3>Product Details</h3>
+                        
+                        <div class="input-group">
+                            <label>Product Images * (Max 5)</label>
+                            <div id="product-upload" class="upload-zone">
+                                <div>📦 Drop product images here<br><small>or click to browse (multiple selection)</small></div>
+                                <input type="file" name="product_images" id="product-images" accept="image/*" multiple style="display: none;" required>
+                            </div>
+                            <div id="images-preview" class="image-grid"></div>
                         </div>
-                        <div id="product-previews" class="multi-upload-grid" style="margin-top:10px;"></div>
+
+                        <div class="input-group">
+                            <label>Product Category *</label>
+                            <select name="product_category" id="product-category" class="input-field" required>
+                                <option value="">Select category...</option>
+                                <option value="electronics">Electronics</option>
+                                <option value="fashion">Fashion & Apparel</option>
+                                <option value="jewelry">Jewelry & Accessories</option>
+                                <option value="cosmetics">Cosmetics & Beauty</option>
+                                <option value="food">Food & Beverage</option>
+                                <option value="furniture">Furniture</option>
+                                <option value="toys">Toys & Games</option>
+                                <option value="sports">Sports Equipment</option>
+                                <option value="home">Home & Garden</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Product Description *</label>
+                            <textarea name="product_description" id="product-description" class="input-field" placeholder="Describe your product (e.g., 'Luxury watch with leather strap', 'Organic skincare bottle')" required></textarea>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Props (comma-separated)</label>
+                            <input type="text" name="props" id="product-props" class="input-field" placeholder="e.g., flowers, leaves, fabric, stones">
+                        </div>
                     </div>
-                    <div class="input-group"><label>Product Category</label><select id="product-category" class="input-field"><option>Electronics</option><option>Fashion & Apparel</option><option>Jewelry & Watches</option><option>Cosmetics & Beauty</option><option>Food & Beverage</option><option>Furniture</option><option>Toys & Games</option><option>Sports Equipment</option><option>Other</option></select></div>
-                    <div class="input-group"><label>Product Description</label><input id="product-description" class="input-field" placeholder="e.g., Luxury leather handbag, matte black"></div>
-                    <div class="input-group"><label><input type="checkbox" id="remove-bg" checked> Auto-remove background</label></div>
-                    <div class="input-group"><label><input type="checkbox" id="preserve-shadows"> Preserve shadows</label></div>
+
+                    <div class="box">
+                        <h3>Photography Settings</h3>
+                        
+                        <div class="input-group">
+                            <label>Scene Type</label>
+                            <select name="scene_type" id="scene-type" class="input-field">
+                                <option value="studio" selected>Studio (Clean)</option>
+                                <option value="lifestyle">Lifestyle</option>
+                                <option value="outdoor">Outdoor</option>
+                                <option value="minimalist">Minimalist</option>
+                                <option value="luxury">Luxury</option>
+                                <option value="industrial">Industrial</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Background Style</label>
+                            <select name="background_style" id="background-style" class="input-field">
+                                <option value="gradient" selected>Gradient</option>
+                                <option value="solid">Solid Color</option>
+                                <option value="textured">Textured</option>
+                                <option value="natural">Natural</option>
+                                <option value="abstract">Abstract</option>
+                                <option value="transparent">Transparent</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Lighting Setup</label>
+                            <select name="lighting_setup" id="lighting-setup" class="input-field">
+                                <option value="soft" selected>Soft Box</option>
+                                <option value="dramatic">Dramatic</option>
+                                <option value="natural">Natural Light</option>
+                                <option value="rim">Rim Lighting</option>
+                                <option value="backlit">Backlit</option>
+                                <option value="studio">Studio Three-Point</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Color Palette</label>
+                            <input type="text" name="color_palette" id="color-palette" class="input-field" placeholder="e.g., warm, cool, monochrome, vibrant">
+                        </div>
+
+                        <div class="slider-group">
+                            <div class="slider-header">
+                                <label>Reflection Intensity</label>
+                                <span id="reflection-value">0</span>
+                            </div>
+                            <input type="range" name="reflection_intensity" id="reflection-intensity" class="slider" min="0" max="1" step="0.1" value="0">
+                        </div>
+
+                        <div class="input-group">
+                            <label>Output Settings</label>
+                            <select name="resolution" id="resolution" class="input-field">
+                                <option value="1024x1024" selected>1024×1024 (Square)</option>
+                                <option value="1280x720">1280×720 (HD)</option>
+                                <option value="1920x1080">1920×1080 (Full HD)</option>
+                                <option value="2048x2048">2048×2048 (High Res)</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Batch Size</label>
+                            <input type="number" name="batch_size" id="batch-size" class="input-field" min="1" max="4" value="1">
+                        </div>
+
+                        <div class="input-group">
+                            <label>
+                                <input type="checkbox" name="remove_background" id="remove-background">
+                                Remove original background
+                            </label>
+                        </div>
+
+                        <div class="input-group">
+                            <label>
+                                <input type="checkbox" name="preserve_shadows" id="preserve-shadows" checked>
+                                Preserve natural shadows
+                            </label>
+                        </div>
+
+                        <button type="submit" id="generate-button" class="button" style="width: 100%; margin-top: 20px;">📸 Generate Product Photos</button>
+                    </div>
                 </div>
-                <div class="box">
-                    <h3>Scene & Styling</h3>
-                    <div class="input-group"><label>Scene Type</label><div id="scene-tags"><span class="tag" data-scene="studio">Studio</span><span class="tag" data-scene="lifestyle">Lifestyle</span><span class="tag" data-scene="outdoor">Outdoor</span><span class="tag" data-scene="minimalist">Minimalist</span><span class="tag" data-scene="luxury">Luxury</span><span class="tag" data-scene="tech">Tech</span><span class="tag" data-scene="natural">Natural</span><span class="tag" data-scene="urban">Urban</span></div></div>
-                    <div class="input-group"><label>Background Style</label><select id="background-style" class="input-field"><option>Clean White</option><option>Gradient</option><option>Textured Surface</option><option>Natural Environment</option><option>Abstract Pattern</option><option>Custom Scene</option></select></div>
-                    <div class="input-group"><label>Lighting Setup</label><select id="lighting-setup" class="input-field"><option>Soft Box (Even)</option><option>Dramatic Side Light</option><option>Natural Window Light</option><option>Studio Three-Point</option><option>Golden Hour</option><option>High Key</option><option>Low Key</option></select></div>
-                    <div class="input-group"><label>Props & Accessories</label><input id="product-props" class="input-field" placeholder="e.g., flowers, coffee cup, laptop"></div>
-                    <div class="input-group"><label>Reflection Intensity: <span id="reflection-value">0.3</span></label><input id="reflection" type="range" min="0" max="1" step="0.1" value="0.3"></div>
-                    <div class="input-group"><label><input type="checkbox" id="add-watermark"> Add brand watermark</label></div>
-                    <div class="input-group"><label><input type="checkbox" id="gen-variations"> Generate variations</label></div>
-                </div>
-            </div>
-            <div class="box" style="margin-top:20px;">
-                <h3>Output Configuration</h3>
-                <div class="layout-grid three-column">
-                    <div class="input-group"><label>Image Format</label><select id="output-format" class="input-field"><option value="square">Square (1:1)</option><option value="portrait">Portrait (3:4)</option><option value="landscape">Landscape (4:3)</option><option value="banner">Banner (16:9)</option><option value="story">Story (9:16)</option></select></div>
-                    <div class="input-group"><label>Resolution</label><select id="resolution" class="input-field"><option value="1024">Web (1024px)</option><option value="1920">HD (1920px)</option><option value="3840">4K (3840px)</option></select></div>
-                    <div class="input-group"><label>Batch Size</label><input id="batch-size" class="input-field" type="number" value="4" min="1" max="10"></div>
-                </div>
-                <div style="display:flex;gap:10px;margin-top:20px;">
-                    <button id="generate-product-shots" class="button" style="flex:1;">🎬 Generate Product Shots</button>
-                </div>
-                <div id="product-results" class="result"></div>
-            </div>
+            </form>
+
+            <div id="product-status" style="margin-top:20px;"></div>
+            <div id="product-result" class="result"></div>
         </div>
     </div>
+
     <script>
-        const up={products:[]};
-        function setupMulti(containerId){const c=document.getElementById(containerId); if(!c) return; c.querySelectorAll('.upload-item').forEach(i=>{i.addEventListener('click',()=>{const input=document.createElement('input'); input.type='file'; input.accept='image/*'; input.multiple=true; input.onchange=(e)=>{const files=Array.from(e.target.files||[]); up.products.push(...files); renderPreviews();}; input.click();});});}
-        function renderPreviews(){const c=document.getElementById('product-previews'); if(!c) return; c.innerHTML=''; up.products.forEach((f,idx)=>{const wrap=document.createElement('div'); wrap.className='upload-item filled'; const r=new FileReader(); r.onload=(e)=>{wrap.innerHTML=`<img src="${e.target.result}" style=\"width:100%;height:100px;object-fit:cover;border-radius:4px;\"><button class=\"remove-btn\" data-idx=\"${idx}\">×</button>`; wrap.querySelector('button').onclick=()=>{up.products.splice(idx,1); renderPreviews();};}; r.readAsDataURL(f); c.appendChild(wrap);});}
-        setupMulti('product-images');
-        document.getElementById('reflection').addEventListener('input', e=>document.getElementById('reflection-value').textContent=e.target.value);
-        document.getElementById('generate-product-shots').addEventListener('click', async ()=>{
-            if(up.products.length===0){ alert('Please upload at least one product image'); return; }
-            const fd=new FormData(); up.products.forEach(p=>fd.append('product_images', p));
-            const scene = document.querySelector('#scene-tags .tag.active')?.dataset.scene || 'studio';
-            const settings={ product_category: document.getElementById('product-category').value, product_description: document.getElementById('product-description').value, scene_type: scene, background_style: document.getElementById('background-style').value, lighting_setup: document.getElementById('lighting-setup').value, props: document.getElementById('product-props').value, remove_background: document.getElementById('remove-bg').checked, preserve_shadows: document.getElementById('preserve-shadows').checked, reflection_intensity: parseFloat(document.getElementById('reflection').value), output_format: document.getElementById('output-format').value, resolution: document.getElementById('resolution').value, batch_size: parseInt(document.getElementById('batch-size').value)||4, add_watermark: document.getElementById('add-watermark').checked, generate_variations: document.getElementById('gen-variations').checked };
-            fd.append('settings', JSON.stringify(settings));
-            const cont=document.getElementById('product-results'); cont.innerHTML='<div style="padding:10px;color:#aaa;">Generating...</div>';
-            try{ const resp=await fetch('/api/generate/product-photoshoot',{method:'POST', body:fd}); const data=await resp.json(); if(!resp.ok){ throw new Error(data?.detail||data?.error||'Request failed'); } const images = data?.result?.images || []; cont.innerHTML = images.length? `<div style=\"display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px\">${images.map(img=>`<img src='${img.url}' style='width:100%;border-radius:8px;'>`).join('')}</div>` : 'No images in response'; }catch(e){ cont.innerHTML=`<div style=\"color:#f44336\">${e.message||String(e)}</div>`; }
+        let selectedFiles = [];
+        
+        // File upload handling
+        const uploadZone = document.getElementById('product-upload');
+        const fileInput = document.getElementById('product-images');
+        const previewContainer = document.getElementById('images-preview');
+        
+        uploadZone.addEventListener('click', () => fileInput.click());
+        
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.style.borderColor = '#667eea';
         });
-        document.querySelectorAll('#scene-tags .tag').forEach(tag=>{tag.addEventListener('click', ()=>{document.querySelectorAll('#scene-tags .tag').forEach(t=>t.classList.remove('active')); tag.classList.add('active');});});
+        
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.style.borderColor = '#444';
+        });
+        
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.style.borderColor = '#444';
+            handleFiles(e.dataTransfer.files);
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+        
+        function handleFiles(files) {
+            selectedFiles = Array.from(files).slice(0, 5); // Max 5 files
+            displayPreviews();
+            uploadZone.classList.add('has-files');
+        }
+        
+        function displayPreviews() {
+            previewContainer.innerHTML = '';
+            selectedFiles.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const preview = document.createElement('div');
+                    preview.className = 'image-preview';
+                    preview.innerHTML = `
+                        <img src="${e.target.result}" alt="Product ${index + 1}">
+                        <button class="remove-image" onclick="removeImage(${index})">×</button>
+                    `;
+                    previewContainer.appendChild(preview);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        window.removeImage = function(index) {
+            selectedFiles.splice(index, 1);
+            displayPreviews();
+            if (selectedFiles.length === 0) {
+                uploadZone.classList.remove('has-files');
+            }
+        };
+        
+        // Slider update
+        document.getElementById('reflection-intensity').addEventListener('input', (e) => {
+            document.getElementById('reflection-value').textContent = e.target.value;
+        });
+        
+        // Form submission
+        document.getElementById('product-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (selectedFiles.length === 0) {
+                alert('Please upload at least one product image');
+                return;
+            }
+            
+            const button = document.getElementById('generate-button');
+            const statusDiv = document.getElementById('product-status');
+            const resultDiv = document.getElementById('product-result');
+            
+            button.disabled = true;
+            button.textContent = '⏳ Generating...';
+            
+            statusDiv.innerHTML = '<div style="color:#667eea;">Processing product images...</div>';
+            resultDiv.innerHTML = '<div style="text-align:center;"><div style="border:3px solid #222;border-top:3px solid #667eea;border-radius:50%;width:36px;height:36px;margin:0 auto;animation:spin 1s linear infinite"></div></div>';
+            
+            const formData = new FormData();
+            selectedFiles.forEach(file => {
+                formData.append('product_images', file);
+            });
+            
+            // Add other form fields
+            const formElements = e.target.elements;
+            for (let element of formElements) {
+                if (element.name && element.name !== 'product_images') {
+                    if (element.type === 'checkbox') {
+                        formData.append(element.name, element.checked);
+                    } else if (element.value) {
+                        formData.append(element.name, element.value);
+                    }
+                }
+            }
+            
+            try {
+                const response = await fetch('/api/extended/product-photoshoot', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data?.detail || `HTTP ${response.status}`);
+                }
+                
+                // Display results
+                if (data?.result?.images && data.result.images.length > 0) {
+                    resultDiv.innerHTML = '<div class="result-grid">' + 
+                        data.result.images.map((img, i) => 
+                            `<div><img src="${img.url || img}" alt="Product photo ${i + 1}"></div>`
+                        ).join('') + '</div>';
+                    statusDiv.innerHTML = '<div style="color:#4CAF50;">✅ Product photos generated successfully!</div>';
+                } else if (data?.result?.message) {
+                    resultDiv.innerHTML = `<div class="note">${data.result.message}</div>`;
+                    statusDiv.innerHTML = `<div style="color:#ff9800;">⚠️ ${data.result.message}</div>`;
+                } else {
+                    resultDiv.innerHTML = '<div class="note">No results returned</div>';
+                }
+                
+            } catch (error) {
+                console.error('Generation error:', error);
+                statusDiv.innerHTML = `<div style="color:#f44336;">❌ Error: ${error.message}</div>`;
+                resultDiv.innerHTML = '';
+            } finally {
+                button.disabled = false;
+                button.textContent = '📸 Generate Product Photos';
+            }
+        });
     </script>
 </body>
 </html>
-
-

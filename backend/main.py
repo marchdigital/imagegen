@@ -3,18 +3,58 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from pathlib import Path
-import base64
-import httpx
-from typing import Dict, Any
+from contextlib import asynccontextmanager
+import logging
+import sys
 import os
-import asyncio
-from dotenv import load_dotenv
 
-load_dotenv()
+# Add backend to path if not already there
+backend_path = Path(__file__).parent.parent
+if str(backend_path) not in sys.path:
+    sys.path.insert(0, str(backend_path))
 
-app = FastAPI(title="AI Image Generator API")
+from backend.database import engine, Base
+from backend.config import settings
 
-# Enable CORS
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Manage application lifecycle"""
+    # Startup
+    logger.info("Starting AI Image Generator...")
+    
+    # Create database tables
+    try:
+        Base.metadata.create_all(bind=engine)
+        logger.info("Database initialized")
+    except Exception as e:
+        logger.warning(f"Database initialization warning: {e}")
+    
+    # Setup storage directories
+    try:
+        from backend.utils.file_manager import FileManager
+        file_manager = FileManager()
+        file_manager.setup_directories()
+        logger.info("Storage directories initialized")
+    except Exception as e:
+        logger.warning(f"Storage setup warning: {e}")
+    
+    yield
+    
+    # Shutdown
+    logger.info("Shutting down...")
+
+# Create FastAPI app
+app = FastAPI(
+    title="AI Image Generator API",
+    version="1.0.0",
+    lifespan=lifespan
+)
+
+# Configure CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -23,254 +63,130 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Import the CLASSES, not instances
-from backend.gallery_manager import GalleryManager
-from backend.project_manager import ProjectManager
-
-# Create instances
-gallery_manager = GalleryManager()
-project_manager = ProjectManager()
-
-# Import the Fal.ai provider
-try:
-    from backend.providers.fal_ai import fal_provider
-    PROVIDER_AVAILABLE = True
-except ImportError:
-    PROVIDER_AVAILABLE = False
-    print("Warning: Fal.ai provider not available")
-
-# Serve frontend
+# Mount static files
 frontend_path = Path(__file__).parent.parent / "frontend"
 storage_path = Path(__file__).parent.parent / "storage"
-enhanced_ui_file = Path(__file__).parent.parent / "enhanced-imagegen-ui.html"
-wan25_ui_file = Path(__file__).parent.parent / "frontend" / "enhanced-wan25.html"
-qwen_ui_file = Path(__file__).parent.parent / "frontend" / "enhanced-qwen.html"
-product_ui_file = Path(__file__).parent.parent / "frontend" / "enhanced-product.html"
 
-# Mount static files
 if frontend_path.exists():
     app.mount("/static", StaticFiles(directory=str(frontend_path)), name="static")
 
 if storage_path.exists():
     app.mount("/storage", StaticFiles(directory=str(storage_path)), name="storage")
 
-# Mount extended generation router
-@app.on_event("startup")
-async def include_extended_routes():
-    try:
-        from backend.api import generation_extended as gen_ext
-        app.include_router(gen_ext.router)
-        print("Extended generation routes mounted")
-    except Exception as e:
-        print(f"Warning: Could not include extended generation routes: {e}")
+# Try to import and include routers
+try:
+    from backend.api import generation
+    app.include_router(generation.router, prefix="/api", tags=["generation"])
+    logger.info("Generation router included")
+except Exception as e:
+    logger.warning(f"Could not include generation router: {e}")
+
+try:
+    from backend.api import gallery
+    app.include_router(gallery.router, prefix="/api", tags=["gallery"])
+    logger.info("Gallery router included")
+except Exception as e:
+    logger.warning(f"Could not include gallery router: {e}")
+
+try:
+    from backend.api import projects
+    app.include_router(projects.router, prefix="/api", tags=["projects"])
+    logger.info("Projects router included")
+except Exception as e:
+    logger.warning(f"Could not include projects router: {e}")
+
+try:
+    from backend.api import settings as settings_api
+    app.include_router(settings_api.router, prefix="/api", tags=["settings"])
+    logger.info("Settings router included")
+except Exception as e:
+    logger.warning(f"Could not include settings router: {e}")
+
+# Import and include the extended generation router
+try:
+    from backend.api import generation_extended
+    app.include_router(generation_extended.router, prefix="/api/extended", tags=["extended"])
+    logger.info("Extended generation router included successfully!")
+except ImportError as e:
+    logger.error(f"Could not import generation_extended: {e}")
+except Exception as e:
+    logger.error(f"Could not include extended generation router: {e}")
 
 @app.get("/")
 async def root():
+    """Serve the frontend application"""
     html_file = frontend_path / "index.html"
     if html_file.exists():
         return FileResponse(html_file)
-    return {"message": "API"}
+    return {"message": "AI Image Generator API"}
 
-@app.get("/enhanced-models")
-async def enhanced_models_ui():
-    if enhanced_ui_file.exists():
-        return FileResponse(enhanced_ui_file)
-    return JSONResponse(status_code=404, content={"error": "Enhanced UI not found"})
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "version": settings.VERSION}
 
+# Enhanced model pages
 @app.get("/models/wan25")
 async def wan25_page():
-    if wan25_ui_file.exists():
-        return FileResponse(wan25_ui_file)
+    wan25_file = frontend_path / "enhanced-wan25.html"
+    if wan25_file.exists():
+        return FileResponse(wan25_file)
     return JSONResponse(status_code=404, content={"error": "WAN-25 page not found"})
 
 @app.get("/models/qwen-edit")
 async def qwen_page():
-    if qwen_ui_file.exists():
-        return FileResponse(qwen_ui_file)
+    qwen_file = frontend_path / "enhanced-qwen.html"
+    if qwen_file.exists():
+        return FileResponse(qwen_file)
     return JSONResponse(status_code=404, content={"error": "Qwen page not found"})
 
 @app.get("/models/product-photoshoot")
 async def product_page():
-    if product_ui_file.exists():
-        return FileResponse(product_ui_file)
-    return JSONResponse(status_code=404, content={"error": "Product Photoshoot page not found"})
+    product_file = frontend_path / "enhanced-product.html"
+    if product_file.exists():
+        return FileResponse(product_file)
+    return JSONResponse(status_code=404, content={"error": "Product page not found"})
 
 @app.get("/api/providers")
 async def get_providers():
+    """Get list of available providers"""
     return [
         {
-            "id": 1,
+            "id": "fal_ai",
             "name": "Fal.ai",
-            "type": "fal_ai",
+            "status": "active" if settings.FAL_API_KEY else "not_configured",
             "models": [
-                {
-                    "id": 1,
-                    "name": "flux-dev",
-                    "display_name": "Flux Dev",
-                    "model_id": "fal-ai/flux/dev",
-                    "type": "image",
-                    "max_width": 1920,
-                    "max_height": 1920,
-                    "supports_img2img": True,
-                    "supports_inpainting": False
-                },
-                {
-                    "id": 2,
-                    "name": "flux-schnell",
-                    "display_name": "Flux Schnell (Fast)",
-                    "model_id": "fal-ai/flux/schnell",
-                    "type": "image",
-                    "max_width": 1920,
-                    "max_height": 1920,
-                    "supports_img2img": False,
-                    "supports_inpainting": False
-                },
-                {
-                    "id": 3,
-                    "name": "sdxl",
-                    "display_name": "Stable Diffusion XL",
-                    "model_id": "fal-ai/fast-sdxl",
-                    "type": "image",
-                    "max_width": 1536,
-                    "max_height": 1536,
-                    "supports_img2img": True,
-                    "supports_inpainting": True
-                }
+                {"id": "flux-pro", "name": "Flux Pro"},
+                {"id": "flux-dev", "name": "Flux Dev"},
+                {"id": "flux-schnell", "name": "Flux Schnell"},
+                {"id": "wan-25-preview", "name": "WAN-25 Preview"},
+                {"id": "qwen-edit", "name": "Qwen Image Edit Plus"},
+                {"id": "product-photoshoot", "name": "Product Photoshoot"}
             ]
+        },
+        {
+            "id": "replicate",
+            "name": "Replicate",
+            "status": "active" if settings.REPLICATE_API_TOKEN else "not_configured",
+            "models": []
+        },
+        {
+            "id": "openai",
+            "name": "OpenAI",
+            "status": "active" if settings.OPENAI_API_KEY else "not_configured",
+            "models": []
         }
     ]
 
-@app.post("/api/generation/generate")
-async def generate_image(params: dict):
-    """Generate an image using the selected provider"""
-    
-    if not PROVIDER_AVAILABLE:
-        return JSONResponse(
-            status_code=500,
-            content={"error": "Provider not configured. Please check your setup."}
-        )
-    
-    # Get the selected model
-    model_id = params.get("model_id")
-    model_map = {
-        1: "fal-ai/flux/dev",
-        2: "fal-ai/flux/schnell", 
-        3: "fal-ai/fast-sdxl"
-    }
-    
-    model = model_map.get(model_id, "fal-ai/flux/dev")
-    
-    # Check if API key is set
-    if not os.getenv("FAL_API_KEY"):
-        return JSONResponse(
-            status_code=500,
-            content={"error": "FAL_API_KEY not set. Please add it to your .env file"}
-        )
-    
-    try:
-        # Call the Fal.ai provider
-        result = await fal_provider.generate_image(
-            prompt=params.get("prompt", ""),
-            model=model,
-            negative_prompt=params.get("negative_prompt", ""),
-            width=params.get("width", 1024),
-            height=params.get("height", 1024),
-            steps=params.get("steps", 20),
-            cfg_scale=params.get("cfg_scale", 7.5),
-            seed=params.get("seed", -1)
-        )
-        
-        if "error" in result:
-            return JSONResponse(
-                status_code=500,
-                content={"error": result["error"]}
-            )
-        
-        # Save to gallery if successful
-        if result.get("success") and result.get("image_url"):
-            try:
-                gallery_image = await gallery_manager.save_image(
-                    image_url=result["image_url"],
-                    prompt=params.get("prompt", ""),
-                    model=model,
-                    params=params
-                )
-                result["gallery_id"] = gallery_image["id"]
-            except Exception as e:
-                print(f"Failed to save to gallery: {e}")
-        
-        return {
-            "success": True,
-            "image_url": result.get("image_url"),
-            "seed": result.get("seed"),
-            "model": result.get("model"),
-            "message": "Image generated successfully!"
-        }
-        
-    except Exception as e:
-        return JSONResponse(
-            status_code=500,
-            content={"error": f"Generation failed: {str(e)}"}
-        )
-
-# Gallery endpoints
-@app.post("/api/gallery/save")
-async def save_to_gallery(data: dict):
-    """Save generated image to local gallery"""
-    result = await gallery_manager.save_image(
-        image_url=data["image_url"],
-        prompt=data["prompt"],
-        model=data["model"],
-        params=data["params"]
-    )
-    return {"success": True, "image": result}
-
-@app.get("/api/gallery/list")
-async def get_gallery_images(limit: int = 50, filter: str = None):
-    """Get gallery images"""
-    images = gallery_manager.get_gallery(limit, filter)
-    return {"images": images, "total": len(images)}
-
-@app.post("/api/gallery/{image_id}/favorite")
-async def toggle_favorite(image_id: int):
-    """Toggle favorite status"""
-    new_status = gallery_manager.toggle_favorite(image_id)
-    return {"success": True, "is_favorite": new_status}
-
-# Project endpoints
-@app.get("/api/projects")
-async def get_projects(active_only: bool = False):
-    return {"projects": project_manager.get_projects(active_only)}
-
-@app.post("/api/projects")
-async def create_project(data: dict):
-    project = project_manager.create_project(data["name"], data.get("description", ""))
-    return {"success": True, "project": project}
-
-@app.put("/api/projects/{project_id}")
-async def update_project(project_id: int, data: dict):
-    project = project_manager.update_project(project_id, data)
-    if project:
-        return {"success": True, "project": project}
-    return {"success": False, "error": "Project not found"}
-
-@app.get("/api/settings")
-async def get_settings():
-    return {"theme": "dark", "autoSave": True}
-
-@app.get("/api/gallery")
-async def get_gallery(limit: int = 10):
-    """Backward compatibility endpoint"""
-    return await get_gallery_images(limit)
-
-@app.get("/api/dashboard/stats")
-async def get_stats():
-    return {
-        "total_generations": len(gallery_manager.metadata.get("images", [])),
-        "storage_usage_gb": 0,
-        "last_generation": None
-    }
-
-@app.get("/health")
-async def health_check():
-    return {"status": "healthy", "version": "1.0.0"}
+# Debug endpoint to check loaded routes
+@app.get("/api/routes")
+async def get_routes():
+    """Get all registered routes for debugging"""
+    routes = []
+    for route in app.routes:
+        if hasattr(route, "path"):
+            routes.append({
+                "path": route.path,
+                "name": route.name,
+                "methods": route.methods if hasattr(route, "methods") else None
+            })
+    return routes
