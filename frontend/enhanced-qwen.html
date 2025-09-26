@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qwen Image Edit Plus - AI-Powered Image Editing</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,sans-serif; background:#0a0a0a; color:#e0e0e0; padding:20px; }
+        .container { max-width:1600px; margin:0 auto; }
+        h1 { color:#fff; margin-bottom:20px; font-size:32px; background:linear-gradient(135deg,#667eea,#764ba2); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        h2 { color:#fff; margin:30px 0 20px; font-size:24px; padding:15px; background:linear-gradient(135deg,#1a1a2e,#16213e); border-left:4px solid #667eea; border-radius:4px; }
+        .model-section { background:#1a1a1a; border:1px solid #333; border-radius:12px; padding:25px; margin-bottom:30px; }
+        .layout-grid { display:grid; gap:20px; }
+        .three-column { grid-template-columns: 1fr 1fr 1fr; }
+        .box { border:1px solid #333; border-radius:8px; padding:20px; background:#0f0f0f; }
+        .input-group { margin-bottom:15px; }
+        .input-group label { display:block; margin-bottom:8px; color:#b0b0b0; font-size:14px; }
+        .input-field { width:100%; padding:10px; border:1px solid #333; background:#0a0a0a; color:#e0e0e0; border-radius:6px; font-size:14px; }
+        textarea.input-field { min-height:100px; }
+        .upload-zone { border:2px dashed #444; border-radius:8px; padding:40px; text-align:center; background:#0a0a0a; cursor:pointer; }
+        .button { background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; border:none; padding:12px 24px; border-radius:6px; cursor:pointer; font-weight:600; }
+        .nav-grid { display:grid; grid-template-columns: repeat(3,1fr); gap:16px; }
+        .nav-card { cursor:pointer; border:1px solid #333; background:#0f0f0f; padding:16px; border-radius:8px; }
+        .nav-card a { color:inherit; text-decoration:none; display:block; }
+        .result { margin-top:20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Enhanced AI Image Generation Suite</h1>
+
+        <h2>Quick Model Selector</h2>
+        <div class="model-section">
+            <div class="nav-grid">
+                <div class="nav-card"><a href="/models/wan25"><h4>🎯 WAN-25 Preview</h4><p>Advanced image-to-image with multiple references</p></a></div>
+                <div class="nav-card"><a href="/models/qwen-edit"><h4>✏️ Qwen Edit Plus</h4><p>Smart image editing and object manipulation</p></a></div>
+                <div class="nav-card"><a href="/models/product-photoshoot"><h4>📸 Product Photoshoot</h4><p>Professional product photography generation</p></a></div>
+            </div>
+        </div>
+
+        <h2>Qwen Image Edit Plus - AI-Powered Image Editing</h2>
+        <div class="model-section">
+            <div class="layout-grid three-column">
+                <div class="box">
+                    <h3>Source Image</h3>
+                    <div id="qwen-image-upload" class="upload-zone"><div>🖼️ Upload Image to Edit<br><small>PNG, JPG up to 10MB</small></div></div>
+                    <div id="qwen-image-preview" style="margin-top:10px;"></div>
+                    <div class="input-group" style="margin-top: 15px;">
+                        <label>Edit Type</label>
+                        <select id="qwen-edit-type" class="input-field">
+                            <option value="auto">Smart Edit (Auto-detect)</option>
+                            <option value="object_removal">Object Removal</option>
+                            <option value="object_replacement">Object Replacement</option>
+                            <option value="background_change">Background Change</option>
+                            <option value="style_transfer">Style Transfer</option>
+                            <option value="color_adjustment">Color Adjustment</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="box">
+                    <h3>Edit Instructions</h3>
+                    <div class="input-group">
+                        <label>What would you like to change?</label>
+                        <textarea id="qwen-instruction" class="input-field" rows="4" placeholder="e.g., 'Remove the person in the background', 'Change the sky to sunset'"></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label>Mask Image (Optional)</label>
+                        <div id="qwen-mask-upload" class="upload-zone" style="min-height: 100px;"><div>🎭 Upload Mask<br><small>White = Edit Area</small></div></div>
+                        <div id="qwen-mask-preview" style="margin-top:10px;"></div>
+                    </div>
+                    <div class="input-group"><label><input type="checkbox" id="qwen-auto-mask" checked> Auto-detect edit region</label></div>
+                    <div class="input-group"><label><input type="checkbox" id="qwen-preserve-style"> Preserve original style</label></div>
+                </div>
+                <div class="box">
+                    <h3>Fine-tuning</h3>
+                    <div class="input-group"><label>Edit Strength: <span id="qwen-strength-value">0.8</span></label><input id="qwen-strength" type="range" min="0" max="1" step="0.05" value="0.8"></div>
+                    <div class="input-group"><label>Coherence: <span id="qwen-coherence-value">0.9</span></label><input id="qwen-coherence" type="range" min="0" max="1" step="0.05" value="0.9"></div>
+                    <button id="apply-qwen-edit" class="button" style="width:100%; margin-top:20px;">✨ Apply Edit</button>
+                    <div id="qwen-result" class="result"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Slider labels
+        const s=(i,l)=>{const e=document.getElementById(i),t=document.getElementById(l); if(e&&t){e.addEventListener('input',ev=>t.textContent=ev.target.value);} }; s('qwen-strength','qwen-strength-value'); s('qwen-coherence','qwen-coherence-value');
+        // Uploads
+        const up={img:null,mask:null};
+        function setupDZ(id,cb){const d=document.getElementById(id); if(!d) return; ['dragenter','dragover','dragleave','drop'].forEach(ev=>d.addEventListener(ev,(e)=>{e.preventDefault();e.stopPropagation();})); d.addEventListener('click',()=>{const i=document.createElement('input'); i.type='file'; i.accept='image/*'; i.onchange=(e)=>{if(e.target.files?.length) cb(e.target.files[0]);}; i.click();}); d.addEventListener('drop',(e)=>{const f=e.dataTransfer.files; if(f.length) cb(f[0]);}); }
+        function preview(file,target){const t=document.getElementById(target); if(!t) return; const r=new FileReader(); r.onload=(e)=>{t.innerHTML=`<img src="${e.target.result}" style=\"max-width:100%;max-height:200px;border-radius:6px;\">`}; r.readAsDataURL(file); }
+        setupDZ('qwen-image-upload',(f)=>{up.img=f; preview(f,'qwen-image-preview');});
+        setupDZ('qwen-mask-upload',(f)=>{up.mask=f; preview(f,'qwen-mask-preview');});
+        // Action
+        document.getElementById('apply-qwen-edit').addEventListener('click', async ()=>{
+            if(!up.img){ alert('Please upload an image'); return; }
+            const fd=new FormData(); fd.append('image', up.img); if(up.mask) fd.append('mask', up.mask);
+            const settings={ instruction: document.getElementById('qwen-instruction').value||'', edit_type: document.getElementById('qwen-edit-type').value, edit_strength: parseFloat(document.getElementById('qwen-strength').value), coherence: parseFloat(document.getElementById('qwen-coherence').value), auto_mask: document.getElementById('qwen-auto-mask').checked, preserve_style: document.getElementById('qwen-preserve-style').checked };
+            fd.append('settings', JSON.stringify(settings));
+            const c=document.getElementById('qwen-result'); c.innerHTML='<div style="padding:10px;color:#aaa;">Processing...</div>';
+            try{ const resp=await fetch('/api/generate/qwen-edit',{method:'POST', body:fd}); const data=await resp.json(); if(!resp.ok){ throw new Error(data?.detail||data?.error||'Request failed'); } const url=(data?.result?.image?.url)||(data?.image?.url)||data?.image_url; c.innerHTML = url?`<img src="${url}">`:'No image URL'; }catch(e){ c.innerHTML = `<div style=\"color:#f44336\">${e.message||String(e)}</div>`; }
+        });
+    </script>
+</body>
+</html>
+
+

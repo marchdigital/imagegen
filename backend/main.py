@@ -42,6 +42,10 @@ except ImportError:
 # Serve frontend
 frontend_path = Path(__file__).parent.parent / "frontend"
 storage_path = Path(__file__).parent.parent / "storage"
+enhanced_ui_file = Path(__file__).parent.parent / "enhanced-imagegen-ui.html"
+wan25_ui_file = Path(__file__).parent.parent / "frontend" / "enhanced-wan25.html"
+qwen_ui_file = Path(__file__).parent.parent / "frontend" / "enhanced-qwen.html"
+product_ui_file = Path(__file__).parent.parent / "frontend" / "enhanced-product.html"
 
 # Mount static files
 if frontend_path.exists():
@@ -50,12 +54,46 @@ if frontend_path.exists():
 if storage_path.exists():
     app.mount("/storage", StaticFiles(directory=str(storage_path)), name="storage")
 
+# Mount extended generation router
+@app.on_event("startup")
+async def include_extended_routes():
+    try:
+        from backend.api import generation_extended as gen_ext
+        app.include_router(gen_ext.router)
+        print("Extended generation routes mounted")
+    except Exception as e:
+        print(f"Warning: Could not include extended generation routes: {e}")
+
 @app.get("/")
 async def root():
     html_file = frontend_path / "index.html"
     if html_file.exists():
         return FileResponse(html_file)
     return {"message": "API"}
+
+@app.get("/enhanced-models")
+async def enhanced_models_ui():
+    if enhanced_ui_file.exists():
+        return FileResponse(enhanced_ui_file)
+    return JSONResponse(status_code=404, content={"error": "Enhanced UI not found"})
+
+@app.get("/models/wan25")
+async def wan25_page():
+    if wan25_ui_file.exists():
+        return FileResponse(wan25_ui_file)
+    return JSONResponse(status_code=404, content={"error": "WAN-25 page not found"})
+
+@app.get("/models/qwen-edit")
+async def qwen_page():
+    if qwen_ui_file.exists():
+        return FileResponse(qwen_ui_file)
+    return JSONResponse(status_code=404, content={"error": "Qwen page not found"})
+
+@app.get("/models/product-photoshoot")
+async def product_page():
+    if product_ui_file.exists():
+        return FileResponse(product_ui_file)
+    return JSONResponse(status_code=404, content={"error": "Product Photoshoot page not found"})
 
 @app.get("/api/providers")
 async def get_providers():
