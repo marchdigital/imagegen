@@ -431,3 +431,168 @@ class FalAIProvider(BaseProvider):
             {"id": "qwen-edit", "name": "Qwen Image Edit Plus", "type": "image-edit"},
             {"id": "product-photoshoot", "name": "Product Photoshoot", "type": "product"}
         ]
+        # Add this method to backend/providers/fal_ai.py in the FalAIProvider class
+
+async def generate_wan25_i2v(
+    self,
+    image_data: str,
+    prompt: str,
+    duration: int = 5,
+    resolution: str = "720p",
+    fps: int = 30,
+    generate_audio: bool = True,
+    guidance_scale: float = 7.0,
+    motion_strength: float = 1.0,
+    camera_movement: str = "auto",
+    seed: Optional[int] = None
+) -> Dict[str, Any]:
+    """Generate video from image using WAN 2.5 Preview Image-to-Video API"""
+    
+    # Use the queue endpoint for longer processing
+    url = "https://queue.fal.run/fal-ai/wan-25-preview/image-to-video"
+    
+    # Convert base64 image to data URL
+    image_url = f"data:image/jpeg;base64,{image_data}"
+    
+    # Build the payload according to WAN 2.5 API docs
+    payload = {
+        "image_url": image_url,
+        "prompt": prompt,
+        "num_frames": duration * fps,  # Calculate total frames
+        "fps": fps,
+        "enable_audio": generate_audio,
+        "cfg_scale": guidance_scale,
+        "motion_bucket_id": int(motion_strength * 127),  # Convert to motion bucket scale (0-255)
+    }
+    
+    # Add resolution mapping
+    if resolution == "1080p":
+        payload["width"] = 1920
+        payload["height"] = 1080
+    else:  # 720p default
+        payload["width"] = 1280
+        payload["height"] = 720
+    
+    # Add seed if provided
+    if seed is not None:
+        payload["seed"] = seed
+    
+    # Add camera movement hints to prompt if specified
+    camera_prompts = {
+        "pan": "camera panning slowly",
+        "zoom": "camera zooming in",
+        "tilt": "camera tilting",
+        "orbit": "camera orbiting around the subject",
+        "tracking": "camera tracking the subject"
+    }
+    
+    if camera_movement != "auto" and camera_movement != "static":
+        if camera_movement in camera_prompts:
+            payload["prompt"] = f"{prompt}, {camera_prompts[camera_movement]}"
+    
+    logger.info(f"Sending WAN 2.5 I2V request to {url}")
+    logger.debug(f"Payload (excluding image): {dict(payload, image_url='[base64_data]')}")
+    
+    try:
+        async with httpx.AsyncClient(timeout=180.0) as client:
+            # Submit the request
+            response = await client.post(
+                f"{url}/submit",
+                json=payload,
+                headers=self.headers
+            )
+            
+            if response.status_code != 200:
+                error_msg = response.text[:500]
+                logger.error(f"WAN 2.5 I2V Submit Error: {error_msg}")
+                raise Exception(f"WAN 2.5 I2V API Error ({response.status_code}): {error_msg}")
+            
+            submit_result = response.json()
+            request_id = submit_result.get("request_id")
+            
+            if not request_id:
+                raise Exception("No request ID received from API")
+            
+            logger.info(f"WAN 2.5 I2V request submitted, ID: {request_id}")
+            
+            # Poll for result
+            max_attempts = 60  # 3 minutes max wait (3 seconds per attempt)
+            for attempt in range(max_attempts):
+                await asyncio.sleep(3)  # Wait 3 seconds between polls
+                
+                status_response = await client.get(
+                    f"{url}/status/{request_id}",
+                    headers=self.headers
+                )
+                
+                if status_response.status_code != 200:
+                    logger.warning(f"Status check failed: {status_response.text[:200]}")
+                    continue
+                
+                status_data = status_response.json()
+                status = status_data.get("status")
+                
+                logger.debug(f"WAN 2.5 I2V status: {status} (attempt {attempt + 1}/{max_attempts})")
+                
+                if status == "completed":
+                    # Get the result
+                    result_response = await client.get(
+                        f"{url}/result/{request_id}",
+                        headers=self.headers
+                    )
+                    
+                    if result_response.status_code != 200:
+                        raise Exception(f"Failed to get result: {result_response.text[:500]}")
+                    
+                    result_data = result_response.json()
+                    
+                    # Extract video URL and metadata
+                    video_info = {}
+                    if "video" in result_data:
+                        video_info = {
+                            "url": result_data["video"].get("url"),
+                            "content_type": result_data["video"].get("content_type", "video/mp4")
+                        }
+                    elif "output" in result_data:
+                        video_info = {
+                            "url": result_data["output"],
+                            "content_type": "video/mp4"
+                        }
+                    else:
+                        raise Exception("No video URL in response")
+                    
+                    # Return formatted response
+                    return {
+                        "video": video_info,
+                        "seed": result_data.get("seed"),
+                        "actual_prompt": result_data.get("actual_prompt", prompt),
+                        "message": "Video generated successfully"
+                    }
+                
+                elif status == "failed" or status == "error":
+                    error = status_data.get("error", "Unknown error")
+                    raise Exception(f"WAN 2.5 I2V generation failed: {error}")
+            
+            # Timeout after max attempts
+            raise Exception("WAN 2.5 I2V generation timed out after 3 minutes")
+            
+    except asyncio.TimeoutError:
+        logger.error("WAN 2.5 I2V request timeout")
+        raise Exception("Request timeout - video generation is taking too long")
+    except Exception as e:
+        logger.error(f"WAN 2.5 I2V error: {str(e)}")
+        raise
+
+# Also add this to the get_models() method if it exists:
+def get_models(self) -> List[Dict[str, Any]]:
+    """Return list of available models"""
+    return [
+        # ... existing models ...
+        {
+            "id": "wan-25-i2v",
+            "name": "WAN 2.5 Image-to-Video",
+            "description": "Transform images into dynamic videos with native audio generation",
+            "type": "image-to-video",
+            "features": ["audio_generation", "camera_control", "motion_control"]
+        }
+    ]

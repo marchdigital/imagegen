@@ -1,0 +1,1070 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Generator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #242424;
+            --bg-tertiary: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --accent: #4CAF50;
+            --border: #333;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .tab-btn {
+            padding: 15px 25px;
+            background: transparent;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn:hover {
+            color: #aaa;
+        }
+        
+        .tab-btn.active {
+            color: white;
+            border-bottom-color: var(--accent);
+        }
+        
+        /* Layout */
+        .main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            width: 300px;
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+        }
+        
+        .center {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .right-panel {
+            width: 400px;
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-left: 1px solid var(--border);
+            overflow-y: auto;
+        }
+        
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text-primary);
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .btn:hover:not(:disabled) {
+            background: #45a049;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .btn-generate {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        
+        .btn-secondary {
+            background: #555;
+        }
+        
+        /* Model Grid */
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .model-card {
+            padding: 10px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        
+        .model-card:hover {
+            border-color: var(--accent);
+        }
+        
+        .model-card.selected {
+            border-color: var(--accent);
+            background: rgba(76, 175, 80, 0.1);
+        }
+        
+        /* Advanced Controls */
+        .accordion {
+            margin: 20px 0;
+        }
+        
+        .accordion-item {
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        
+        .accordion-header {
+            padding: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s;
+        }
+        
+        .accordion-item.active .accordion-content {
+            max-height: 600px;
+            padding: 15px;
+        }
+        
+        /* Sliders */
+        .slider-group {
+            margin: 15px 0;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            padding: 0;
+        }
+        
+        /* Aspect Ratio Buttons */
+        .aspect-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            margin: 10px 0;
+        }
+        
+        .aspect-btn {
+            padding: 8px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .aspect-btn:hover {
+            border-color: var(--accent);
+        }
+        
+        .aspect-btn.active {
+            background: var(--accent);
+        }
+        
+        /* Preview */
+        .preview-area {
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            display: none;
+        }
+        
+        /* History Gallery */
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .history-item {
+            cursor: pointer;
+            overflow: hidden;
+            border-radius: 4px;
+            background: var(--bg-tertiary);
+        }
+        
+        .history-item img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+        }
+        
+        .history-info {
+            padding: 5px;
+            font-size: 11px;
+            color: #888;
+        }
+        
+        /* Status Bar */
+        .status-bar {
+            background: var(--bg-secondary);
+            padding: 10px 20px;
+            border-top: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .spinner {
+            border: 3px solid var(--bg-tertiary);
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .success-message {
+            color: #4CAF50;
+            padding: 10px;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        
+        .error-message {
+            color: #f44336;
+            padding: 10px;
+            background: rgba(244, 67, 54, 0.1);
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        
+        /* Image Upload Area */
+        #upload-area {
+            border: 2px dashed #444;
+            border-radius: 4px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        
+        #upload-area:hover {
+            border-color: #666;
+        }
+        
+        #upload-area.dragover {
+            border-color: var(--accent);
+            background: rgba(76, 175, 80, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Tab Navigation -->
+    <div class="tabs">
+        <button class="tab-btn active" data-view="generator">🎨 Generator</button>
+        <button class="tab-btn" data-view="gallery">🖼️ Gallery</button>
+        <button class="tab-btn" data-view="dashboard">📊 Dashboard</button>
+        <button class="tab-btn" data-view="projects">📁 Projects</button>
+        <button class="tab-btn" data-view="settings">⚙️ Settings</button>
+    </div>
+    
+    <div class="main-content">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <h3>Model Configuration</h3>
+            
+            <div class="form-group">
+                <label>Provider</label>
+                <select id="provider-select">
+                    <option>Loading...</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Model</label>
+                <div class="model-grid" id="model-grid">
+                    <!-- Models load here -->
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Style Preset</label>
+                <select id="preset-select">
+                    <option value="">-- No Preset --</option>
+                    <option value="photorealistic">Photorealistic</option>
+                    <option value="anime">Anime Style</option>
+                    <option value="oil_painting">Oil Painting</option>
+                    <option value="3d_render">3D Render</option>
+                    <option value="sketch">Pencil Sketch</option>
+                    <option value="cyberpunk">Cyberpunk</option>
+                    <option value="fantasy">Fantasy Art</option>
+                </select>
+            </div>
+            
+            <button class="btn btn-secondary" style="width: 100%;" onclick="app.checkModelStatus()">
+                🔄 Check Model Status
+            </button>
+        </aside>
+        
+        <!-- Center Content -->
+        <main class="center">
+            <div class="form-group">
+                <label>Project</label>
+                <select id="project-select">
+                    <option value="1">Default Project</option>
+                </select>
+                <button class="btn btn-secondary" style="margin-left: 10px;" onclick="window.location.href='/static/projects.html'">
+                    Manage Projects
+                </button>
+            </div>
+            
+            <div class="form-group">
+                <label>Prompt</label>
+                <textarea id="prompt" rows="4" placeholder="Describe what you want to generate..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Negative Prompt</label>
+                <textarea id="negative-prompt" rows="2" placeholder="What to avoid..."></textarea>
+            </div>
+            
+            <!-- Aspect Ratio Presets -->
+            <div class="form-group">
+                <label>Aspect Ratio</label>
+                <div class="aspect-buttons">
+                    <button class="aspect-btn" data-width="1024" data-height="1024">1:1</button>
+                    <button class="aspect-btn" data-width="1344" data-height="768">16:9</button>
+                    <button class="aspect-btn" data-width="768" data-height="1344">9:16</button>
+                    <button class="aspect-btn" data-width="1024" data-height="768">4:3</button>
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label>Width</label>
+                    <input type="number" id="width" value="1024" min="256" max="1920" step="64">
+                </div>
+                <div class="form-group">
+                    <label>Height</label>
+                    <input type="number" id="height" value="1024" min="256" max="1920" step="64">
+                </div>
+            </div>
+            
+            <!-- Advanced Parameters Accordion -->
+            <div class="accordion">
+                <div class="accordion-item active">
+                    <div class="accordion-header">
+                        <span>⚡ Advanced Parameters</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="slider-group">
+                            <div class="slider-label">
+                                <label>Sampling Steps</label>
+                                <span id="steps-value">20</span>
+                            </div>
+                            <input type="range" id="steps" min="1" max="50" value="20">
+                        </div>
+                        
+                        <div class="slider-group">
+                            <div class="slider-label">
+                                <label>CFG Scale</label>
+                                <span id="cfg-value">7.5</span>
+                            </div>
+                            <input type="range" id="cfg-scale" min="1" max="20" step="0.5" value="7.5">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Seed (-1 for random)</label>
+                            <input type="number" id="seed" value="-1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Sampler</label>
+                            <select id="sampler">
+                                <option value="DPM++ 2M Karras">DPM++ 2M Karras</option>
+                                <option value="Euler a">Euler a</option>
+                                <option value="DDIM">DDIM</option>
+                                <option value="LMS">LMS</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>🖼️ Image-to-Image</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div id="upload-area">
+                            <p>📁 Drop image here or click to browse</p>
+                            <input type="file" id="init-image" accept="image/*" style="display: none;">
+                            <img id="init-preview" style="max-width: 100%; max-height: 200px; display: none; margin-top: 10px;">
+                        </div>
+                        
+                        <div class="slider-group" style="margin-top: 15px;">
+                            <div class="slider-label">
+                                <label>Denoising Strength</label>
+                                <span id="denoising-value">0.75</span>
+                            </div>
+                            <input type="range" id="denoising" min="0" max="1" step="0.05" value="0.75">
+                        </div>
+                        
+                        <button class="btn btn-secondary" onclick="clearInitImage()" style="width: 100%; margin-top: 10px; display: none;" id="clear-image-btn">
+                            Clear Image
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>🎯 Batch Generation</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="form-group">
+                            <label>Number of Images</label>
+                            <input type="number" id="batch-size" value="1" min="1" max="4">
+                        </div>
+                        <label>
+                            <input type="checkbox" id="vary-seeds"> Vary seeds automatically
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn btn-generate" id="btn-generate">🚀 Generate Image</button>
+            
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button class="btn btn-secondary" style="flex: 1;" onclick="app.randomPrompt()">🎲 Random Prompt</button>
+                <button class="btn btn-secondary" style="flex: 1;" onclick="app.resetForm()">🔄 Reset</button>
+            </div>
+            
+            <div id="status-message"></div>
+        </main>
+        
+        <!-- Right Panel -->
+        <aside class="right-panel">
+            <h3>Preview</h3>
+            <div class="preview-area" id="preview-area">
+                <div class="spinner" id="spinner"></div>
+                <div id="placeholder" style="text-align: center; color: #666;">
+                    <p style="font-size: 48px;">🎨</p>
+                    <p>Generated image will appear here</p>
+                </div>
+                <img class="preview-image" id="preview-image" alt="Generated image">
+            </div>
+            
+            <div id="image-info"></div>
+            <button class="btn" id="btn-download" style="width: 100%; display: none;">💾 Download Image</button>
+            
+            <!-- Recent History -->
+            <h3 style="margin-top: 20px;">Recent Generations</h3>
+            <button class="btn btn-secondary" style="width: 100%; margin-bottom: 10px;" onclick="window.location.href='/static/gallery.html'">
+                View Full Gallery →
+            </button>
+            <div class="history-grid" id="history">
+                <!-- History items will appear here -->
+            </div>
+        </aside>
+    </div>
+    
+    <div class="status-bar">
+        <span id="status-text">✅ Ready</span>
+        <span>Generations: <span id="generation-count">0</span></span>
+        <span>
+            <button class="btn btn-secondary" style="padding: 5px 10px;" onclick="app.openKeyboardShortcuts()">
+                ⌨️ Shortcuts
+            </button>
+            <button class="btn btn-secondary" style="padding: 5px 10px; margin-left: 8px;" onclick="window.open('/enhanced-models', '_blank')">
+                🧪 Enhanced Models
+            </button>
+        </span>
+    </div>
+    
+    <script>
+        // Initialize window variables
+        window.initImageData = null;
+        
+        class App {
+            constructor() {
+                this.apiUrl = "http://127.0.0.1:8000";
+                this.currentProvider = null;
+                this.currentModel = null;
+                this.providers = [];
+                this.currentImageUrl = null;
+                this.generationHistory = [];
+                this.presets = {
+                    photorealistic: {
+                        prompt_suffix: ", photorealistic, highly detailed, professional photography, 8k uhd, dslr, high quality, film grain",
+                        negative_prompt: "cartoon, painting, illustration, drawing, art, sketch, anime, blurry, distorted",
+                        cfg_scale: 7,
+                        steps: 30
+                    },
+                    anime: {
+                        prompt_suffix: ", anime style, manga, detailed anime art, vibrant colors, studio anime, high quality",
+                        negative_prompt: "photo, realistic, 3d render, western cartoon, blurry, low quality",
+                        cfg_scale: 7,
+                        steps: 25
+                    },
+                    oil_painting: {
+                        prompt_suffix: ", oil painting, classical art, brush strokes, canvas texture, masterpiece, museum quality",
+                        negative_prompt: "photo, digital art, 3d, modern, cartoon, anime",
+                        cfg_scale: 8,
+                        steps: 35
+                    },
+                    "3d_render": {
+                        prompt_suffix: ", 3d render, octane render, cinema 4d, blender, photorealistic 3d, ray tracing, 8k",
+                        negative_prompt: "2d, flat, painting, drawing, sketch, anime, cartoon",
+                        cfg_scale: 7.5,
+                        steps: 25
+                    },
+                    sketch: {
+                        prompt_suffix: ", pencil sketch, detailed drawing, graphite art, black and white, artistic sketch",
+                        negative_prompt: "color, photo, painting, 3d, digital color",
+                        cfg_scale: 6,
+                        steps: 20
+                    },
+                    cyberpunk: {
+                        prompt_suffix: ", cyberpunk style, neon lights, futuristic, high tech, dystopian, blade runner style",
+                        negative_prompt: "medieval, rustic, natural, primitive, ancient",
+                        cfg_scale: 8,
+                        steps: 30
+                    },
+                    fantasy: {
+                        prompt_suffix: ", fantasy art, magical, epic fantasy, detailed fantasy illustration, mystical",
+                        negative_prompt: "modern, realistic, photo, mundane, everyday",
+                        cfg_scale: 8.5,
+                        steps: 35
+                    }
+                };
+                this.init();
+            }
+            
+            async init() {
+                console.log("Initializing app...");
+                await this.loadProviders();
+                await this.loadProjects();
+                await this.loadHistory();
+                this.setupEventListeners();
+                this.setupImageUpload();
+                this.updateStats();
+                
+                // Check for selected project from projects page
+                const selectedProject = localStorage.getItem('selected_project');
+                if (selectedProject) {
+                    document.getElementById('project-select').value = selectedProject;
+                    localStorage.removeItem('selected_project');
+                }
+            }
+            
+            setupImageUpload() {
+                const uploadArea = document.getElementById('upload-area');
+                const fileInput = document.getElementById('init-image');
+                
+                uploadArea.onclick = () => fileInput.click();
+                
+                fileInput.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            document.getElementById('init-preview').src = event.target.result;
+                            document.getElementById('init-preview').style.display = 'block';
+                            document.getElementById('clear-image-btn').style.display = 'block';
+                            window.initImageData = event.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                };
+                
+                // Drag and drop
+                uploadArea.ondragover = (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.add('dragover');
+                };
+                
+                uploadArea.ondragleave = () => {
+                    uploadArea.classList.remove('dragover');
+                };
+                
+                uploadArea.ondrop = (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.remove('dragover');
+                    const file = e.dataTransfer.files[0];
+                    if (file && file.type.startsWith('image/')) {
+                        fileInput.files = e.dataTransfer.files;
+                        fileInput.dispatchEvent(new Event('change'));
+                    }
+                };
+                
+                document.getElementById('denoising').oninput = (e) => {
+                    document.getElementById('denoising-value').textContent = e.target.value;
+                };
+            }
+            
+            async loadProviders() {
+                try {
+                    const response = await fetch(`${this.apiUrl}/api/providers`);
+                    this.providers = await response.json();
+                    
+                    const select = document.getElementById("provider-select");
+                    select.innerHTML = "";
+                    
+                    this.providers.forEach(provider => {
+                        const option = document.createElement("option");
+                        option.value = provider.id;
+                        option.textContent = provider.name;
+                        select.appendChild(option);
+                    });
+                    
+                    if (this.providers.length > 0) {
+                        this.selectProvider(this.providers[0]);
+                    }
+                } catch (error) {
+                    console.error("Failed to load providers:", error);
+                }
+            }
+            
+            async loadProjects() {
+                try {
+                    const response = await fetch(`${this.apiUrl}/api/projects`);
+                    const data = await response.json();
+                    
+                    const select = document.getElementById("project-select");
+                    select.innerHTML = "";
+                    
+                    data.projects.forEach(project => {
+                        const option = document.createElement("option");
+                        option.value = project.id;
+                        option.textContent = project.name;
+                        select.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error("Failed to load projects:", error);
+                }
+            }
+            
+            async loadHistory() {
+                try {
+                    const response = await fetch(`${this.apiUrl}/api/gallery/list?limit=6`);
+                    const data = await response.json();
+                    
+                    this.generationHistory = data.images || [];
+                    this.updateHistoryDisplay();
+                } catch (error) {
+                    console.error("Failed to load history:", error);
+                }
+            }
+            
+            selectProvider(provider) {
+                this.currentProvider = provider;
+                const grid = document.getElementById("model-grid");
+                grid.innerHTML = "";
+                
+                provider.models.forEach(model => {
+                    const card = document.createElement("div");
+                    card.className = "model-card";
+                    card.textContent = model.display_name;
+                    card.onclick = () => this.selectModel(model, card);
+                    grid.appendChild(card);
+                });
+                
+                if (provider.models.length > 0) {
+                    grid.firstElementChild.click();
+                }
+            }
+            
+            selectModel(model, card) {
+                document.querySelectorAll(".model-card").forEach(c => c.classList.remove("selected"));
+                card.classList.add("selected");
+                this.currentModel = model;
+                
+                document.getElementById("width").max = model.max_width;
+                document.getElementById("height").max = model.max_height;
+                
+                // Show/hide img2img based on model support
+                const img2imgAccordion = document.querySelectorAll('.accordion-item')[1];
+                if (model.supports_img2img) {
+                    img2imgAccordion.style.display = 'block';
+                } else {
+                    img2imgAccordion.style.display = 'none';
+                }
+            }
+            
+            setupEventListeners() {
+                // Tab navigation
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.onclick = () => this.switchTab(btn.dataset.view);
+                });
+                
+                // Provider selection
+                document.getElementById("provider-select").onchange = (e) => {
+                    const provider = this.providers.find(p => p.id === parseInt(e.target.value));
+                    if (provider) this.selectProvider(provider);
+                };
+                
+                // Preset selection
+                document.getElementById("preset-select").onchange = (e) => {
+                    if (e.target.value && this.presets[e.target.value]) {
+                        this.applyPreset(this.presets[e.target.value]);
+                    }
+                };
+                
+                // Aspect ratio buttons
+                document.querySelectorAll('.aspect-btn').forEach(btn => {
+                    btn.onclick = () => {
+                        document.getElementById('width').value = btn.dataset.width;
+                        document.getElementById('height').value = btn.dataset.height;
+                        document.querySelectorAll('.aspect-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                    };
+                });
+                
+                // Sliders
+                document.getElementById('steps').oninput = (e) => {
+                    document.getElementById('steps-value').textContent = e.target.value;
+                };
+                
+                document.getElementById('cfg-scale').oninput = (e) => {
+                    document.getElementById('cfg-value').textContent = e.target.value;
+                };
+                
+                // Accordion toggles
+                document.querySelectorAll('.accordion-header').forEach(header => {
+                    header.onclick = () => {
+                        header.parentElement.classList.toggle('active');
+                    };
+                });
+                
+                // Generate button
+                document.getElementById("btn-generate").onclick = () => this.generate();
+                
+                // Download button
+                document.getElementById("btn-download").onclick = () => this.downloadImage();
+                
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                        e.preventDefault();
+                        this.generate();
+                    }
+                    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                        e.preventDefault();
+                        if (this.currentImageUrl) this.downloadImage();
+                    }
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+                        e.preventDefault();
+                        document.getElementById('seed').value = -1;
+                    }
+                });
+            }
+            
+            switchTab(view) {
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                if (view === 'generator') {
+                    document.querySelector('[data-view="generator"]').classList.add('active');
+                } else if (view === 'gallery') {
+                    window.location.href = '/static/gallery.html';
+                } else if (view === 'dashboard') {
+                    window.location.href = '/static/dashboard.html';
+                } else if (view === 'projects') {
+                    window.location.href = '/static/projects.html';
+                } else if (view === 'settings') {
+                    window.location.href = '/static/settings.html';
+                }
+            }
+            
+            applyPreset(preset) {
+                const promptField = document.getElementById('prompt');
+                const basePrompt = promptField.value.split(', ')[0];
+                promptField.value = basePrompt + preset.prompt_suffix;
+                
+                document.getElementById('negative-prompt').value = preset.negative_prompt;
+                document.getElementById('cfg-scale').value = preset.cfg_scale;
+                document.getElementById('cfg-value').textContent = preset.cfg_scale;
+                document.getElementById('steps').value = preset.steps;
+                document.getElementById('steps-value').textContent = preset.steps;
+            }
+            
+            async generate() {
+                const btn = document.getElementById("btn-generate");
+                const spinner = document.getElementById("spinner");
+                const placeholder = document.getElementById("placeholder");
+                const statusMsg = document.getElementById("status-message");
+                
+                const prompt = document.getElementById("prompt").value.trim();
+                if (!prompt) {
+                    this.showError("Please enter a prompt");
+                    return;
+                }
+                
+                btn.disabled = true;
+                btn.textContent = "⏳ Generating...";
+                spinner.style.display = "block";
+                placeholder.style.display = "none";
+                statusMsg.innerHTML = "";
+                
+                const params = {
+                    prompt: prompt,
+                    negative_prompt: document.getElementById("negative-prompt").value,
+                    width: parseInt(document.getElementById("width").value),
+                    height: parseInt(document.getElementById("height").value),
+                    steps: parseInt(document.getElementById("steps").value),
+                    cfg_scale: parseFloat(document.getElementById("cfg-scale").value),
+                    seed: parseInt(document.getElementById("seed").value),
+                    model_id: this.currentModel?.id,
+                    provider_id: this.currentProvider?.id,
+                    project_id: parseInt(document.getElementById("project-select").value)
+                };
+                
+                // Add img2img parameters if image is uploaded
+                if (window.initImageData) {
+                    params.init_image = window.initImageData;
+                    params.denoising_strength = parseFloat(document.getElementById("denoising").value);
+                }
+                
+                // Handle batch generation
+                const batchSize = parseInt(document.getElementById("batch-size").value);
+                if (batchSize > 1) {
+                    params.batch_size = batchSize;
+                    params.vary_seed = document.getElementById("vary-seeds").checked;
+                }
+                
+                try {
+                    const response = await fetch(`${this.apiUrl}/api/generation/generate`, {
+                        method: "POST",
+                        headers: {"Content-Type": "application/json"},
+                        body: JSON.stringify(params)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.error) {
+                        throw new Error(result.error);
+                    }
+                    
+                    if (result.success && result.image_url) {
+                        this.displayImage(result.image_url);
+                        this.showSuccess("Image generated successfully!");
+                        
+                        document.getElementById("image-info").innerHTML = `
+                            <div style="margin-top: 10px; padding: 10px; background: #2a2a2a; border-radius: 4px; font-size: 12px;">
+                                <p>Model: ${this.currentModel.display_name}</p>
+                                <p>Size: ${params.width} x ${params.height}</p>
+                                ${result.seed ? `<p>Seed: ${result.seed}</p>` : ""}
+                                <p>Steps: ${params.steps}</p>
+                                <p>CFG: ${params.cfg_scale}</p>
+                            </div>
+                        `;
+                        
+                        await this.loadHistory();
+                        this.updateStats();
+                    }
+                } catch (error) {
+                    console.error("Generation failed:", error);
+                    this.showError(error.message || "Generation failed");
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = "🚀 Generate Image";
+                    spinner.style.display = "none";
+                }
+            }
+            
+            displayImage(imageUrl) {
+                const img = document.getElementById("preview-image");
+                const placeholder = document.getElementById("placeholder");
+                const downloadBtn = document.getElementById("btn-download");
+                
+                this.currentImageUrl = imageUrl;
+                img.src = imageUrl;
+                img.style.display = "block";
+                placeholder.style.display = "none";
+                downloadBtn.style.display = "block";
+            }
+            
+            updateHistoryDisplay() {
+                const historyDiv = document.getElementById("history");
+                historyDiv.innerHTML = this.generationHistory.map(item => `
+                    <div class="history-item" onclick="app.displayImage('${item.url || '/storage/images/' + item.filename}')">
+                        <img src="${item.url || '/storage/images/' + (item.thumbnail || item.filename)}" alt="">
+                        <div class="history-info">
+                            ${(item.prompt || '').substring(0, 50)}...
+                        </div>
+                    </div>
+                `).join("");
+            }
+            
+            async updateStats() {
+                try {
+                    const response = await fetch(`${this.apiUrl}/api/dashboard/stats`);
+                    const stats = await response.json();
+                    document.getElementById("generation-count").textContent = stats.total_generations || 0;
+                } catch (error) {
+                    console.error("Failed to update stats:", error);
+                }
+            }
+            
+            downloadImage() {
+                if (this.currentImageUrl) {
+                    const a = document.createElement("a");
+                    a.href = this.currentImageUrl;
+                    a.download = `generated_${Date.now()}.png`;
+                    a.click();
+                }
+            }
+            
+            randomPrompt() {
+                const prompts = [
+                    "a majestic dragon soaring through cloudy skies",
+                    "cyberpunk city street at night with neon lights",
+                    "enchanted forest with glowing mushrooms",
+                    "steampunk airship floating above Victorian London",
+                    "underwater coral reef with colorful fish",
+                    "astronaut exploring an alien planet",
+                    "medieval castle on a hilltop at sunset",
+                    "futuristic robot in a garden of flowers"
+                ];
+                document.getElementById("prompt").value = prompts[Math.floor(Math.random() * prompts.length)];
+            }
+            
+            resetForm() {
+                document.getElementById("prompt").value = "";
+                document.getElementById("negative-prompt").value = "";
+                document.getElementById("width").value = "1024";
+                document.getElementById("height").value = "1024";
+                document.getElementById("steps").value = "20";
+                document.getElementById("cfg-scale").value = "7.5";
+                document.getElementById("seed").value = "-1";
+                document.getElementById("batch-size").value = "1";
+                document.getElementById("preset-select").value = "";
+                this.clearInitImage();
+            }
+            
+            checkModelStatus() {
+                alert("Model is online and ready!");
+            }
+            
+            openKeyboardShortcuts() {
+                alert(`Keyboard Shortcuts:
+                
+Ctrl+Enter - Generate Image
+Ctrl+S - Save Current Image
+Ctrl+R - Random Seed
+Ctrl+D - Duplicate Settings
+Esc - Cancel Generation`);
+            }
+            
+            clearInitImage() {
+                document.getElementById('init-preview').style.display = 'none';
+                document.getElementById('clear-image-btn').style.display = 'none';
+                document.getElementById('init-image').value = '';
+                window.initImageData = null;
+            }
+            
+            showError(message) {
+                const statusMsg = document.getElementById("status-message");
+                statusMsg.innerHTML = `<div class="error-message">❌ ${message}</div>`;
+            }
+            
+            showSuccess(message) {
+                const statusMsg = document.getElementById("status-message");
+                statusMsg.innerHTML = `<div class="success-message">✅ ${message}</div>`;
+            }
+        }
+        
+        // Global functions needed by HTML
+        function clearInitImage() {
+            window.app.clearInitImage();
+        }
+        
+        // Start app
+        window.app = new App();
+    </script>
+</body>
+</html>

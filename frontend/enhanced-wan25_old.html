@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WAN-25 Preview - Advanced Image Generation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background: #0a0a0a; color: #e0e0e0; padding: 20px; }
+        .container { max-width: 1600px; margin: 0 auto; }
+        h1 { color: #ffffff; margin-bottom: 20px; font-size: 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        h2 { color: #ffffff; margin: 30px 0 20px 0; font-size: 24px; padding: 15px; background: linear-gradient(135deg, #1a1a2e, #16213e); border-left: 4px solid #667eea; border-radius: 4px; }
+        .model-section { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+        .model-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #333; }
+        .model-title { font-size: 20px; color: #ffffff; display: flex; align-items: center; gap: 10px; }
+        .model-badge { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .layout-grid { display: grid; gap: 20px; margin-bottom: 20px; }
+        .two-column { grid-template-columns: 1fr 1fr; }
+        .box { border: 1px solid #333; border-radius: 8px; padding: 20px; background: #0f0f0f; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 8px; color: #b0b0b0; font-size: 14px; font-weight: 500; }
+        .input-field { width: 100%; padding: 10px; border: 1px solid #333; background: #0a0a0a; color: #e0e0e0; border-radius: 6px; font-size: 14px; }
+        textarea.input-field { resize: vertical; min-height: 100px; }
+        .button { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .button.secondary { background: #2a2a2a; border: 1px solid #444; }
+        .slider-group { margin: 20px 0; }
+        .slider-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .slider { width: 100%; height: 6px; border-radius: 3px; background: #333; outline: none; }
+        .result { margin-top: 20px; }
+        .result img { max-width: 100%; border-radius: 8px; margin-top: 10px; }
+        .model-section .note { color: #b0b0b0; font-size: 12px; margin-top: 8px; }
+        .nav-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .nav-card { cursor: pointer; border: 1px solid #333; background: #0f0f0f; padding: 16px; border-radius: 8px; }
+        .nav-card a { color: inherit; text-decoration: none; display: block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Enhanced AI Image Generation Suite</h1>
+
+        <h2>Quick Model Selector</h2>
+        <div class="model-section">
+            <div class="nav-grid">
+                <div class="nav-card"><a href="/models/wan25"><h4>🎯 WAN-25 Preview</h4><p class="note">Advanced text-to-image generation</p></a></div>
+                <div class="nav-card"><a href="/models/qwen-edit"><h4>✏️ Qwen Edit Plus</h4><p class="note">Smart image editing and object manipulation</p></a></div>
+                <div class="nav-card"><a href="/models/product-photoshoot"><h4>📸 Product Photoshoot</h4><p class="note">Professional product photography generation</p></a></div>
+            </div>
+        </div>
+
+        <h2>WAN-25 Preview - Advanced Text-to-Image</h2>
+        <div class="model-section">
+            <div class="model-header">
+                <div class="model-title"><span>🎯 WAN-25 Preview</span><span class="model-badge">NEW</span></div>
+            </div>
+
+            <form id="wan25-form">
+                <div class="layout-grid two-column">
+                    <div class="box">
+                        <h3>Input Configuration</h3>
+                        <div class="input-group">
+                            <label>Prompt</label>
+                            <textarea name="prompt" id="wan25-prompt" class="input-field" placeholder="Describe what you want to generate..." required></textarea>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Negative Prompt (Optional)</label>
+                            <textarea name="negative_prompt" id="wan25-negative" class="input-field" placeholder="What to avoid in the generation..."></textarea>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Style (Optional)</label>
+                            <input type="text" name="style" id="wan25-style" class="input-field" placeholder="e.g., photorealistic, anime, oil painting...">
+                        </div>
+                    </div>
+
+                    <div class="box">
+                        <h3>Output Settings</h3>
+                        <div class="input-group">
+                            <label>Aspect Ratio</label>
+                            <select name="aspect_ratio" id="wan25-aspect" class="input-field">
+                                <option value="1:1" selected>1:1 Square</option>
+                                <option value="16:9">16:9 Landscape</option>
+                                <option value="9:16">9:16 Portrait</option>
+                                <option value="4:3">4:3 Classic</option>
+                                <option value="3:4">3:4 Portrait Classic</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Output Format</label>
+                            <select name="output_format" id="wan25-format" class="input-field">
+                                <option value="webp" selected>WebP (Efficient)</option>
+                                <option value="png">PNG (Lossless)</option>
+                                <option value="jpeg">JPEG (Compatible)</option>
+                            </select>
+                        </div>
+
+                        <div class="slider-group">
+                            <div class="slider-header"><label>Quality</label><span id="wan25-quality-value">80</span></div>
+                            <input type="range" name="quality" id="wan25-quality" class="slider" min="1" max="100" value="80">
+                        </div>
+
+                        <div class="input-group">
+                            <label>Seed (Optional)</label>
+                            <input type="number" name="seed" id="wan25-seed" class="input-field" placeholder="Leave empty for random">
+                        </div>
+
+                        <button type="submit" id="generate-wan25" class="button" style="width: 100%; margin-top: 20px;">🚀 Generate with WAN-25</button>
+                    </div>
+                </div>
+            </form>
+
+            <div id="wan25-status" style="margin-top:20px;"></div>
+            <div id="wan25-result" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Slider value display
+        const qualitySlider = document.getElementById('wan25-quality');
+        const qualityValue = document.getElementById('wan25-quality-value');
+        if (qualitySlider && qualityValue) {
+            qualitySlider.addEventListener('input', (e) => {
+                qualityValue.textContent = e.target.value;
+            });
+        }
+
+        function setStatus(message, type='info') {
+            const el = document.getElementById('wan25-status');
+            if (!el) return;
+            const colors = { info: '#aaa', success: '#4CAF50', error: '#f44336' };
+            const bg = type==='error' ? 'rgba(244,67,54,0.1)' : type==='success' ? 'rgba(76,175,80,0.1)' : 'transparent';
+            el.innerHTML = `<div style="padding:10px;border-radius:6px;color:${colors[type]};background:${bg}">${message}</div>`;
+        }
+
+        function showLoading(containerId) {
+            const c = document.getElementById(containerId);
+            if (!c) return;
+            c.innerHTML = `
+                <div style="padding:20px;text-align:center;">
+                    <div style="border:3px solid #222;border-top:3px solid #667eea;border-radius:50%;width:36px;height:36px;margin:0 auto;animation:spin 1s linear infinite"></div>
+                    <p style="margin-top:10px;color:#aaa">Generating...</p>
+                </div>
+            `;
+        }
+
+        function showError(containerId, msg) {
+            const c = document.getElementById(containerId);
+            if (!c) return;
+            c.innerHTML = `<div style="color:#f44336;background:rgba(244,67,54,0.1);padding:10px;border-radius:6px;">Error: ${msg}</div>`;
+        }
+
+        function showResult(containerId, result) {
+            const c = document.getElementById(containerId);
+            if (!c) return;
+            
+            // Check for images in the result
+            if (result?.result?.images && result.result.images.length > 0) {
+                c.innerHTML = '';
+                result.result.images.forEach((img, index) => {
+                    const imgContainer = document.createElement('div');
+                    imgContainer.style.marginTop = '10px';
+                    
+                    const imgEl = document.createElement('img');
+                    imgEl.src = img.url || img;
+                    imgEl.alt = `Generated image ${index + 1}`;
+                    imgEl.style.maxWidth = '100%';
+                    imgEl.style.borderRadius = '8px';
+                    
+                    imgContainer.appendChild(imgEl);
+                    c.appendChild(imgContainer);
+                });
+                
+                const note = document.createElement('div');
+                note.className = 'note';
+                note.textContent = 'Generation completed successfully!';
+                c.appendChild(note);
+            } else {
+                c.innerHTML = `<div class="note">No images in response. Check console for details.</div>`;
+                console.log('Full response:', result);
+            }
+        }
+
+        // Form submission handler
+        document.getElementById('wan25-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('generate-wan25');
+            btn.disabled = true;
+            btn.textContent = '⏳ Generating...';
+            setStatus('Submitting generation request...', 'info');
+            
+            const formData = new FormData(e.target);
+            
+            // Convert empty seed to null
+            const seed = formData.get('seed');
+            if (!seed || seed === '') {
+                formData.delete('seed');
+            }
+            
+            showLoading('wan25-result');
+            
+            try {
+                const response = await fetch('/api/extended/wan25', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data?.detail || data?.error || `HTTP ${response.status}`);
+                }
+                
+                console.log('Generation response:', data);
+                showResult('wan25-result', data);
+                setStatus('✅ Generation completed successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Generation error:', error);
+                showError('wan25-result', error.message || String(error));
+                setStatus('❌ Generation failed', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🚀 Generate with WAN-25';
+            }
+        });
+
+        // Restore settings on load (simplified for text-to-image)
+        (function restoreSettings() {
+            try {
+                const saved = localStorage.getItem('wan25_prompt');
+                if (saved) {
+                    document.getElementById('wan25-prompt').value = saved;
+                }
+            } catch {}
+        })();
+
+        // Save prompt on change
+        document.getElementById('wan25-prompt').addEventListener('change', (e) => {
+            try {
+                localStorage.setItem('wan25_prompt', e.target.value);
+            } catch {}
+        });
+    </script>
+</body>
+</html>

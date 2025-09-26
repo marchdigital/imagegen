@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Creative Studio | Advanced Image & Video Generation</title>
+    <title>Enhanced AI Models | Advanced Generators</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * {
@@ -134,47 +134,6 @@
             margin-bottom: 2rem;
         }
 
-        .quick-start {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 3rem;
-        }
-
-        .btn-hero {
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn-hero-primary {
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 100%);
-            color: white;
-            border: none;
-        }
-
-        .btn-hero-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-hero-secondary {
-            background: transparent;
-            color: var(--text-primary);
-            border: 2px solid var(--border);
-        }
-
-        .btn-hero-secondary:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: var(--accent);
-        }
-
         /* Filter Tabs */
         .filter-tabs {
             display: flex;
@@ -210,15 +169,6 @@
             max-width: 1400px;
             margin: 0 auto;
             padding: 0 2rem 4rem;
-        }
-
-        .section-title {
-            font-size: 1.75rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
         }
 
         .models-grid {
@@ -299,11 +249,6 @@
             color: white;
         }
 
-        .badge-classic {
-            background: #555;
-            color: white;
-        }
-
         .card-title {
             font-size: 1.5rem;
             font-weight: 700;
@@ -373,19 +318,6 @@
             z-index: 10;
         }
 
-        /* Classic Generator Card - Special Styling */
-        .classic-generator {
-            grid-column: span 2;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            border: 2px solid rgba(102, 126, 234, 0.3);
-        }
-
-        @media (max-width: 850px) {
-            .classic-generator {
-                grid-column: span 1;
-            }
-        }
-
         /* Footer */
         .footer {
             margin-top: auto;
@@ -419,17 +351,6 @@
                 width: 100%;
                 justify-content: center;
             }
-
-            .quick-start {
-                flex-direction: column;
-                width: 100%;
-                padding: 0 2rem;
-            }
-
-            .btn-hero {
-                width: 100%;
-                justify-content: center;
-            }
         }
 
         /* Animation */
@@ -453,42 +374,6 @@
         .model-card:nth-child(4) { animation-delay: 0.3s; }
         .model-card:nth-child(5) { animation-delay: 0.4s; }
         .model-card:nth-child(6) { animation-delay: 0.5s; }
-
-        /* Stats Bar */
-        .stats-bar {
-            background: var(--bg-card);
-            padding: 1.5rem;
-            margin: 2rem auto;
-            max-width: 1400px;
-            border-radius: 16px;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            border: 1px solid var(--border);
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--accent);
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-top: 0.25rem;
-        }
-
-        @media (max-width: 768px) {
-            .stats-bar {
-                flex-direction: column;
-                gap: 1.5rem;
-            }
-        }
     </style>
 </head>
 <body>
@@ -497,16 +382,16 @@
         <div class="header-content">
             <a href="/" class="logo">
                 <i class="fas fa-rocket"></i>
-                <h1>AI Creative Studio</h1>
+                <h1>Enhanced AI Models</h1>
             </a>
             <div class="nav-buttons">
+                <a href="/" class="btn-nav">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Generator
+                </a>
                 <a href="/static/gallery.html" class="btn-nav">
                     <i class="fas fa-images"></i>
                     Gallery
-                </a>
-                <a href="/static/projects.html" class="btn-nav">
-                    <i class="fas fa-folder"></i>
-                    Projects
                 </a>
                 <a href="/static/dashboard.html" class="btn-nav btn-primary">
                     <i class="fas fa-chart-line"></i>
@@ -518,19 +403,8 @@
 
     <!-- Hero Section -->
     <section class="hero">
-        <h2>Create with AI</h2>
-        <p>Professional image and video generation powered by cutting-edge AI models</p>
-        
-        <div class="quick-start">
-            <a href="/generator.html" class="btn-hero btn-hero-primary">
-                <i class="fas fa-magic"></i>
-                Quick Generate
-            </a>
-            <a href="/static/gallery.html" class="btn-hero btn-hero-secondary">
-                <i class="fas fa-images"></i>
-                Browse Gallery
-            </a>
-        </div>
+        <h2>Next-Generation AI Models</h2>
+        <p>Explore our collection of cutting-edge image and video generation models powered by the latest AI technology</p>
         
         <!-- Filter Tabs -->
         <div class="filter-tabs">
@@ -549,64 +423,12 @@
         </div>
     </section>
 
-    <!-- Stats Bar -->
-    <div class="stats-bar">
-        <div class="stat-item">
-            <div class="stat-value" id="totalGenerations">0</div>
-            <div class="stat-label">Total Generations</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-value" id="modelsAvailable">8</div>
-            <div class="stat-label">Models Available</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-value" id="activeProjects">0</div>
-            <div class="stat-label">Active Projects</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-value" id="avgSpeed">15s</div>
-            <div class="stat-label">Avg Generation Time</div>
-        </div>
-    </div>
-
     <!-- Models Grid -->
     <main class="models-container">
-        <h3 class="section-title">
-            <i class="fas fa-sparkles"></i>
-            Available Models
-        </h3>
         <div class="models-grid" id="modelsGrid">
             
-            <!-- Classic Generator - Featured -->
-            <a href="/generator.html" class="model-card classic-generator" data-category="image">
-                <div class="card-header">
-                    <div class="card-icon">🎨</div>
-                    <span class="badge badge-classic">CLASSIC</span>
-                </div>
-                <h3 class="card-title">Universal Image Generator</h3>
-                <p class="card-description">Our flagship multi-model generator supporting all major AI models including Stable Diffusion, DALL-E, and Midjourney. Perfect for general purpose image creation with advanced controls.</p>
-                <div class="card-features">
-                    <span class="feature-tag">
-                        <i class="fas fa-layer-group"></i> Multi-Model
-                    </span>
-                    <span class="feature-tag">
-                        <i class="fas fa-sliders-h"></i> Advanced Controls
-                    </span>
-                    <span class="feature-tag">
-                        <i class="fas fa-history"></i> Batch Generation
-                    </span>
-                    <span class="feature-tag">
-                        <i class="fas fa-paint-brush"></i> Style Presets
-                    </span>
-                </div>
-                <div class="card-stats">
-                    <span><i class="fas fa-bolt"></i> Most Popular</span>
-                    <span><i class="fas fa-star"></i> Full Featured</span>
-                </div>
-            </a>
-            
             <!-- WAN 2.5 Image-to-Video -->
-            <a href="/models/wan25-i2v" class="model-card" data-category="video">
+            <a href="/wan25-i2v.html" class="model-card" data-category="video">
                 <div class="card-header">
                     <div class="card-icon">🎬</div>
                     <span class="badge badge-new">NEW</span>
@@ -630,33 +452,33 @@
                 </div>
             </a>
 
-            <!-- WAN 2.5 Preview Text-to-Image -->
-            <a href="/models/wan25" class="model-card" data-category="image">
+            <!-- WAN 2.5 Text-to-Video Preview -->
+            <a href="/wan25.html" class="model-card" data-category="video">
                 <div class="card-header">
-                    <div class="card-icon">🎨</div>
+                    <div class="card-icon">🎥</div>
                     <span class="badge badge-pro">PRO</span>
                 </div>
-                <h3 class="card-title">WAN 2.5 Preview</h3>
-                <p class="card-description">Advanced text-to-image generation with exceptional detail and prompt adherence. Create stunning visuals with precise control.</p>
+                <h3 class="card-title">WAN 2.5 Text-to-Video</h3>
+                <p class="card-description">Generate high-quality videos directly from text prompts. Create stunning cinematics with just your imagination.</p>
                 <div class="card-features">
                     <span class="feature-tag">
-                        <i class="fas fa-text-height"></i> Text-to-Image
+                        <i class="fas fa-text-height"></i> Text-to-Video
                     </span>
                     <span class="feature-tag">
-                        <i class="fas fa-palette"></i> Style Control
+                        <i class="fas fa-film"></i> 5-10s Duration
                     </span>
                     <span class="feature-tag">
-                        <i class="fas fa-magic"></i> High Detail
+                        <i class="fas fa-magic"></i> Style Presets
                     </span>
                 </div>
                 <div class="card-stats">
-                    <span><i class="fas fa-clock"></i> 15-20s generation</span>
-                    <span><i class="fas fa-coins"></i> $0.10/image</span>
+                    <span><i class="fas fa-clock"></i> 45s generation</span>
+                    <span><i class="fas fa-coins"></i> $0.40/video</span>
                 </div>
             </a>
 
             <!-- Qwen Edit Plus -->
-            <a href="/models/qwen-edit" class="model-card" data-category="editing">
+            <a href="/qwen-edit.html" class="model-card" data-category="editing">
                 <div class="card-header">
                     <div class="card-icon">✨</div>
                     <span class="badge badge-beta">BETA</span>
@@ -681,7 +503,7 @@
             </a>
 
             <!-- Product Photoshoot -->
-            <a href="/models/product-photoshoot" class="model-card" data-category="image">
+            <a href="/product-photoshoot.html" class="model-card" data-category="image">
                 <div class="card-header">
                     <div class="card-icon">📸</div>
                     <span class="badge badge-pro">PRO</span>
@@ -757,60 +579,15 @@
                 </div>
             </div>
 
-            <!-- Minimax Hailuo (Coming Soon) -->
-            <div class="model-card coming-soon" data-category="video">
-                <div class="coming-soon-overlay">COMING SOON</div>
-                <div class="card-header">
-                    <div class="card-icon">🌊</div>
-                    <span class="badge badge-new">SOON</span>
-                </div>
-                <h3 class="card-title">Minimax Hailuo AI</h3>
-                <p class="card-description">State-of-the-art video synthesis with unprecedented motion coherence and temporal consistency.</p>
-                <div class="card-features">
-                    <span class="feature-tag">
-                        <i class="fas fa-wind"></i> Fluid Motion
-                    </span>
-                    <span class="feature-tag">
-                        <i class="fas fa-sync"></i> Consistency
-                    </span>
-                    <span class="feature-tag">
-                        <i class="fas fa-palette"></i> Style Transfer
-                    </span>
-                </div>
-                <div class="card-stats">
-                    <span><i class="fas fa-clock"></i> 90s generation</span>
-                    <span><i class="fas fa-coins"></i> $0.75/video</span>
-                </div>
-            </div>
-
         </div>
     </main>
 
     <!-- Footer -->
     <footer class="footer">
-        <p>© 2024 AI Creative Studio. Powered by fal.ai and cutting-edge AI technology.</p>
-        <p style="margin-top: 0.5rem;">
-            <a href="/static/settings.html" style="color: var(--text-secondary); text-decoration: none; margin: 0 1rem;">Settings</a>
-            <a href="https://github.com/yourusername/project" style="color: var(--text-secondary); text-decoration: none; margin: 0 1rem;">GitHub</a>
-            <a href="/api/docs" style="color: var(--text-secondary); text-decoration: none; margin: 0 1rem;">API Docs</a>
-        </p>
+        <p>© 2024 Enhanced AI Models. Powered by fal.ai and cutting-edge AI technology.</p>
     </footer>
 
     <script>
-        // Load stats from API
-        async function loadStats() {
-            try {
-                const response = await fetch('/api/dashboard/stats');
-                if (response.ok) {
-                    const stats = await response.json();
-                    document.getElementById('totalGenerations').textContent = stats.total_generations || 0;
-                    document.getElementById('activeProjects').textContent = stats.total_projects || 0;
-                }
-            } catch (error) {
-                console.error('Failed to load stats:', error);
-            }
-        }
-
         // Filter functionality
         function filterModels(category) {
             // Update active tab
@@ -835,42 +612,27 @@
             });
         }
 
+        // Add hover sound effect (optional)
+        document.querySelectorAll('.model-card:not(.coming-soon)').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                // Could add a subtle hover sound here
+            });
+        });
+
         // Keyboard navigation
         document.addEventListener('keydown', (e) => {
-            // Quick shortcuts
-            if (e.ctrlKey || e.metaKey) {
-                if (e.key === 'g') {
-                    e.preventDefault();
-                    window.location.href = '/generator.html';
-                }
-                if (e.key === 'd') {
-                    e.preventDefault();
-                    window.location.href = '/static/dashboard.html';
-                }
+            if (e.key === 'Escape') {
+                window.location.href = '/';
             }
         });
 
-        // Page load animation and stats
+        // Page load animation
         window.addEventListener('load', () => {
-            loadStats();
-            
             document.querySelectorAll('.model-card').forEach((card, index) => {
                 card.style.opacity = '0';
                 setTimeout(() => {
                     card.style.opacity = '1';
                 }, index * 100);
-            });
-        });
-
-        // Add some interactivity
-        const statsValues = document.querySelectorAll('.stat-value');
-        statsValues.forEach(stat => {
-            stat.addEventListener('mouseenter', () => {
-                stat.style.transform = 'scale(1.1)';
-                stat.style.transition = 'transform 0.3s';
-            });
-            stat.addEventListener('mouseleave', () => {
-                stat.style.transform = 'scale(1)';
             });
         });
     </script>

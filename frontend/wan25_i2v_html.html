@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WAN 2.5 Image-to-Video | AI Video Generation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/frontend/styles/shared.css">
+    <style>
+        /* Page-specific styles */
+        .upload-preview {
+            position: relative;
+            width: 100%;
+            max-height: 400px;
+            overflow: hidden;
+            border-radius: 12px;
+            background: #1a1a1a;
+        }
+
+        .upload-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .upload-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .upload-preview:hover .upload-overlay {
+            opacity: 1;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            background: #1a1a1a;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .video-container video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .video-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .prompt-examples {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .example-chip {
+            padding: 0.25rem 0.75rem;
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.3s;
+        }
+
+        .example-chip:hover {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+
+        .duration-slider {
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.25rem;
+            font-size: 0.875rem;
+            color: #b0b0b0;
+        }
+
+        .audio-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            background: #333;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(24px);
+        }
+
+        .info-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            color: #4caf50;
+            margin-bottom: 1rem;
+        }
+
+        .error-message {
+            padding: 1rem;
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            border-radius: 8px;
+            color: #f44336;
+            margin-top: 1rem;
+        }
+
+        .loading-video {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .loading-video .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(102, 126, 234, 0.2);
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            animation: progress 30s linear;
+        }
+
+        @keyframes progress {
+            from { width: 0%; }
+            to { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-brand">
+            <span class="gradient-text">WAN 2.5 Image-to-Video</span>
+        </div>
+        <a href="/" class="nav-link">
+            <i class="fas fa-arrow-left"></i>
+            Back to Home
+        </a>
+    </nav>
+
+    <div class="container">
+        <div class="generator-section">
+            <div class="main-content">
+                <div class="input-section">
+                    <div class="info-badge">
+                        <i class="fas fa-sparkles"></i>
+                        <span>Transform your images into dynamic videos with native audio generation</span>
+                    </div>
+
+                    <!-- Image Upload -->
+                    <div class="input-group">
+                        <label for="imageUpload">Upload Image</label>
+                        <div id="dropZone" class="drop-zone">
+                            <div id="uploadContent">
+                                <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                                <p>Drag & drop an image here or click to browse</p>
+                                <p style="font-size: 0.875rem; color: #b0b0b0;">Supported formats: JPG, PNG, WEBP (Max 10MB)</p>
+                            </div>
+                            <div id="previewContainer" class="upload-preview" style="display: none;">
+                                <img id="previewImage" src="" alt="Preview">
+                                <div class="upload-overlay">
+                                    <button onclick="removeImage()" class="btn-secondary">
+                                        <i class="fas fa-times"></i> Remove
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+                    </div>
+
+                    <!-- Motion Prompt -->
+                    <div class="input-group">
+                        <label for="prompt">Motion Description</label>
+                        <textarea id="prompt" 
+                                  placeholder="Describe the camera movement and action you want in the video..."
+                                  rows="4"></textarea>
+                        <div class="prompt-examples">
+                            <div class="example-chip" onclick="setPrompt('The camera slowly zooms in while the subject turns their head to look at the viewer')">
+                                👤 Portrait Motion
+                            </div>
+                            <div class="example-chip" onclick="setPrompt('Camera pans across the landscape as clouds drift overhead and light changes subtly')">
+                                🏞️ Landscape Pan
+                            </div>
+                            <div class="example-chip" onclick="setPrompt('The camera circles around the object, revealing its details from all angles')">
+                                🔄 360° Reveal
+                            </div>
+                            <div class="example-chip" onclick="setPrompt('Slow motion capture with dramatic lighting changes and particles floating in the air')">
+                                ✨ Cinematic Effect
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <button id="generateBtn" class="generate-btn" onclick="generateVideo()">
+                        <i class="fas fa-video"></i>
+                        <span>Generate Video</span>
+                    </button>
+                </div>
+
+                <div class="output-section">
+                    <h3 style="margin-bottom: 1rem;">Generated Video</h3>
+                    <div id="videoOutput" class="image-grid">
+                        <div class="placeholder">
+                            <i class="fas fa-film" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                            <p>Your generated video will appear here</p>
+                            <p style="font-size: 0.875rem; color: #b0b0b0;">Upload an image and describe the motion to get started</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <!-- Video Settings -->
+                <div class="settings-section">
+                    <div class="section-header" onclick="toggleSection('videoSettings')">
+                        <span>Video Settings</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div id="videoSettings" class="section-content">
+                        <!-- Duration -->
+                        <div class="input-group">
+                            <label for="duration">Duration: <span id="durationValue">5</span>s</label>
+                            <input type="range" id="duration" class="duration-slider" 
+                                   min="3" max="10" value="5" step="1"
+                                   oninput="updateDurationLabel(this.value)">
+                            <div class="slider-labels">
+                                <span>3s</span>
+                                <span>10s</span>
+                            </div>
+                        </div>
+
+                        <!-- Resolution -->
+                        <div class="input-group">
+                            <label for="resolution">Resolution</label>
+                            <select id="resolution">
+                                <option value="720p" selected>720p HD</option>
+                                <option value="1080p">1080p Full HD</option>
+                            </select>
+                        </div>
+
+                        <!-- FPS -->
+                        <div class="input-group">
+                            <label for="fps">Frame Rate</label>
+                            <select id="fps">
+                                <option value="24">24 FPS (Cinematic)</option>
+                                <option value="30" selected>30 FPS (Standard)</option>
+                                <option value="60">60 FPS (Smooth)</option>
+                            </select>
+                        </div>
+
+                        <!-- Audio Generation -->
+                        <div class="audio-toggle">
+                            <label style="margin: 0;">Generate Audio</label>
+                            <div id="audioToggle" class="toggle-switch active" onclick="toggleAudio()">
+                                <div class="toggle-slider"></div>
+                            </div>
+                            <i class="fas fa-info-circle" title="WAN 2.5 can generate contextual audio"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Settings -->
+                <div class="settings-section">
+                    <div class="section-header" onclick="toggleSection('advancedSettings')">
+                        <span>Advanced Settings</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div id="advancedSettings" class="section-content" style="display: none;">
+                        <!-- Guidance Scale -->
+                        <div class="input-group">
+                            <label for="guidanceScale">Guidance Scale: <span id="guidanceValue">7</span></label>
+                            <input type="range" id="guidanceScale" min="1" max="15" value="7" step="0.5"
+                                   oninput="document.getElementById('guidanceValue').textContent = this.value">
+                        </div>
+
+                        <!-- Motion Strength -->
+                        <div class="input-group">
+                            <label for="motionStrength">Motion Strength: <span id="motionValue">1.0</span></label>
+                            <input type="range" id="motionStrength" min="0.5" max="2.0" value="1.0" step="0.1"
+                                   oninput="document.getElementById('motionValue').textContent = this.value">
+                        </div>
+
+                        <!-- Seed -->
+                        <div class="input-group">
+                            <label for="seed">Seed (optional)</label>
+                            <input type="number" id="seed" placeholder="Random seed for reproducibility">
+                        </div>
+
+                        <!-- Camera Movement -->
+                        <div class="input-group">
+                            <label for="cameraMovement">Camera Movement</label>
+                            <select id="cameraMovement">
+                                <option value="auto">Auto-detect</option>
+                                <option value="static">Static</option>
+                                <option value="pan">Pan</option>
+                                <option value="zoom">Zoom</option>
+                                <option value="tilt">Tilt</option>
+                                <option value="orbit">Orbit</option>
+                                <option value="tracking">Tracking</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tips -->
+                <div class="settings-section">
+                    <div class="section-header" onclick="toggleSection('tips')">
+                        <span>Pro Tips</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div id="tips" class="section-content" style="display: none;">
+                        <ul style="font-size: 0.875rem; color: #b0b0b0; padding-left: 1.5rem;">
+                            <li>Use high-resolution images (at least 1024x1024) for best results</li>
+                            <li>Describe both camera movement and subject action in your prompt</li>
+                            <li>Enable audio generation for more immersive videos</li>
+                            <li>Longer videos (8-10s) work better for complex motions</li>
+                            <li>Use cinematic terms like "dolly", "crane shot", "rack focus" for professional results</li>
+                            <li>Keep motion descriptions coherent with the static image content</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for full-screen video preview -->
+    <div id="videoModal" class="modal" onclick="closeVideoModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="modal-close" onclick="closeVideoModal()">&times;</span>
+            <video id="modalVideo" controls autoplay></video>
+        </div>
+    </div>
+
+    <script>
+        let uploadedImageData = null;
+        let audioEnabled = true;
+
+        // Initialize file upload
+        document.addEventListener('DOMContentLoaded', function() {
+            setupFileUpload();
+        });
+
+        function setupFileUpload() {
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('imageUpload');
+            
+            dropZone.addEventListener('click', () => {
+                if (!uploadedImageData) {
+                    fileInput.click();
+                }
+            });
+            
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('drag-over');
+            });
+            
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('drag-over');
+            });
+            
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('drag-over');
+                handleFiles(e.dataTransfer.files);
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+            });
+        }
+
+        function handleFiles(files) {
+            const file = files[0];
+            if (file && file.type.startsWith('image/')) {
+                // Check file size (10MB limit)
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('File size must be less than 10MB');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = function() {
+                        // Resize image if needed
+                        const maxSize = 2048;
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > maxSize || height > maxSize) {
+                            if (width > height) {
+                                height = (height * maxSize) / width;
+                                width = maxSize;
+                            } else {
+                                width = (width * maxSize) / height;
+                                height = maxSize;
+                            }
+                        }
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        // Convert to base64 with compression
+                        canvas.toBlob((blob) => {
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                uploadedImageData = e.target.result.split(',')[1];
+                                displayUploadedImage(e.target.result);
+                            };
+                            reader.readAsDataURL(blob);
+                        }, 'image/jpeg', 0.85);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function displayUploadedImage(dataUrl) {
+            document.getElementById('uploadContent').style.display = 'none';
+            document.getElementById('previewContainer').style.display = 'block';
+            document.getElementById('previewImage').src = dataUrl;
+        }
+
+        function removeImage() {
+            uploadedImageData = null;
+            document.getElementById('uploadContent').style.display = 'flex';
+            document.getElementById('previewContainer').style.display = 'none';
+            document.getElementById('previewImage').src = '';
+            document.getElementById('imageUpload').value = '';
+        }
+
+        function setPrompt(text) {
+            document.getElementById('prompt').value = text;
+        }
+
+        function updateDurationLabel(value) {
+            document.getElementById('durationValue').textContent = value;
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            const toggle = document.getElementById('audioToggle');
+            toggle.classList.toggle('active');
+        }
+
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            const icon = section.previousElementSibling.querySelector('i');
+            
+            if (section.style.display === 'none' || !section.style.display) {
+                section.style.display = 'block';
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            } else {
+                section.style.display = 'none';
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            }
+        }
+
+        async function generateVideo() {
+            const generateBtn = document.getElementById('generateBtn');
+            const btnText = generateBtn.querySelector('span');
+            const btnIcon = generateBtn.querySelector('i');
+            
+            // Validate inputs
+            if (!uploadedImageData) {
+                alert('Please upload an image first');
+                return;
+            }
+            
+            const prompt = document.getElementById('prompt').value.trim();
+            if (!prompt) {
+                alert('Please describe the motion for your video');
+                return;
+            }
+            
+            // Disable button and show loading
+            generateBtn.disabled = true;
+            btnText.textContent = 'Generating...';
+            btnIcon.className = 'fas fa-spinner fa-spin';
+            
+            // Clear previous results and show loading state
+            const outputDiv = document.getElementById('videoOutput');
+            outputDiv.innerHTML = `
+                <div class="loading-video">
+                    <div class="spinner"></div>
+                    <h4>Generating your video...</h4>
+                    <p style="color: #b0b0b0; margin-top: 0.5rem;">This may take 30-60 seconds</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+            `;
+            
+            // Prepare the payload
+            const payload = {
+                image_data: uploadedImageData,
+                prompt: prompt,
+                duration: parseInt(document.getElementById('duration').value),
+                resolution: document.getElementById('resolution').value,
+                fps: parseInt(document.getElementById('fps').value),
+                generate_audio: audioEnabled,
+                guidance_scale: parseFloat(document.getElementById('guidanceScale').value),
+                motion_strength: parseFloat(document.getElementById('motionStrength').value),
+                camera_movement: document.getElementById('cameraMovement').value
+            };
+            
+            const seed = document.getElementById('seed').value;
+            if (seed) {
+                payload.seed = parseInt(seed);
+            }
+            
+            try {
+                const response = await fetch('/api/extended/wan25-i2v', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Video generation failed');
+                }
+                
+                const data = await response.json();
+                displayVideo(data);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                outputDiv.innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-triangle"></i> ${error.message}
+                    </div>
+                `;
+            } finally {
+                generateBtn.disabled = false;
+                btnText.textContent = 'Generate Video';
+                btnIcon.className = 'fas fa-video';
+            }
+        }
+
+        function displayVideo(data) {
+            const outputDiv = document.getElementById('videoOutput');
+            outputDiv.innerHTML = '';
+            
+            if (data.video && data.video.url) {
+                const videoContainer = document.createElement('div');
+                videoContainer.className = 'video-container';
+                
+                const video = document.createElement('video');
+                video.src = data.video.url;
+                video.controls = true;
+                video.autoplay = true;
+                video.loop = true;
+                
+                const actions = document.createElement('div');
+                actions.className = 'video-actions';
+                actions.innerHTML = `
+                    <button onclick="downloadVideo('${data.video.url}', 'generated-video.mp4')" 
+                            class="action-btn" title="Download">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button onclick="openVideoModal('${data.video.url}')" 
+                            class="action-btn" title="Fullscreen">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                `;
+                
+                videoContainer.appendChild(video);
+                videoContainer.appendChild(actions);
+                outputDiv.appendChild(videoContainer);
+                
+                // Display additional info if available
+                if (data.actual_prompt) {
+                    const info = document.createElement('div');
+                    info.style.marginTop = '1rem';
+                    info.style.padding = '1rem';
+                    info.style.background = 'rgba(255, 255, 255, 0.05)';
+                    info.style.borderRadius = '8px';
+                    info.innerHTML = `
+                        <p style="font-size: 0.875rem; color: #b0b0b0;">
+                            <strong>Enhanced Prompt:</strong> ${data.actual_prompt}
+                        </p>
+                        ${data.seed ? `<p style="font-size: 0.875rem; color: #b0b0b0; margin-top: 0.5rem;">
+                            <strong>Seed:</strong> ${data.seed}
+                        </p>` : ''}
+                    `;
+                    outputDiv.appendChild(info);
+                }
+            } else {
+                outputDiv.innerHTML = '<div class="error-message">No video was generated. Please try again.</div>';
+            }
+        }
+
+        function downloadVideo(url, filename) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function openVideoModal(videoUrl) {
+            const modal = document.getElementById('videoModal');
+            const modalVideo = document.getElementById('modalVideo');
+            modalVideo.src = videoUrl;
+            modal.style.display = 'block';
+            modalVideo.play();
+        }
+
+        function closeVideoModal() {
+            const modal = document.getElementById('videoModal');
+            const modalVideo = document.getElementById('modalVideo');
+            modal.style.display = 'none';
+            modalVideo.pause();
+            modalVideo.src = '';
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeVideoModal();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -4,62 +4,653 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Qwen Image Edit Plus - AI Image Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background: #0a0a0a; color: #e0e0e0; padding: 20px; }
-        .container { max-width: 1600px; margin: 0 auto; }
-        h1 { color: #ffffff; margin-bottom: 20px; font-size: 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        h2 { color: #ffffff; margin: 30px 0 20px 0; font-size: 24px; padding: 15px; background: linear-gradient(135deg, #1a1a2e, #16213e); border-left: 4px solid #667eea; border-radius: 4px; }
-        .model-section { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
-        .model-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #333; }
-        .model-title { font-size: 20px; color: #ffffff; display: flex; align-items: center; gap: 10px; }
-        .model-badge { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
-        .layout-grid { display: grid; gap: 20px; margin-bottom: 20px; }
-        .two-column { grid-template-columns: 1fr 1fr; }
-        .box { border: 1px solid #333; border-radius: 8px; padding: 20px; background: #0f0f0f; }
-        .input-group { margin-bottom: 15px; }
-        .input-group label { display: block; margin-bottom: 8px; color: #b0b0b0; font-size: 14px; font-weight: 500; }
-        .input-field { width: 100%; padding: 10px; border: 1px solid #333; background: #0a0a0a; color: #e0e0e0; border-radius: 6px; font-size: 14px; }
-        textarea.input-field { resize: vertical; min-height: 100px; }
-        .button { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: 600; }
-        .button:disabled { opacity: 0.5; cursor: not-allowed; }
-        .upload-zone { border: 2px dashed #444; border-radius: 8px; padding: 40px; text-align: center; background: #0a0a0a; cursor: pointer; transition: all 0.3s; }
-        .upload-zone:hover { border-color: #667eea; background: #111; }
-        .upload-zone.has-file { border-color: #4CAF50; background: #0a1a0a; }
-        .preview-container { margin-top: 10px; position: relative; }
-        .preview-container img { max-width: 100%; max-height: 300px; border-radius: 8px; }
-        .slider-group { margin: 20px 0; }
-        .slider-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
-        .slider { width: 100%; height: 6px; border-radius: 3px; background: #333; outline: none; -webkit-appearance: none; }
-        .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #667eea; cursor: pointer; }
-        .slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #667eea; cursor: pointer; }
-        .result { margin-top: 20px; }
-        .result img { max-width: 100%; border-radius: 8px; margin-top: 10px; }
-        .note { color: #b0b0b0; font-size: 12px; margin-top: 8px; }
-        .nav-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-        .nav-card { cursor: pointer; border: 1px solid #333; background: #0f0f0f; padding: 16px; border-radius: 8px; transition: all 0.3s; }
-        .nav-card:hover { border-color: #667eea; transform: translateY(-2px); }
-        .nav-card a { color: inherit; text-decoration: none; display: block; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        :root {
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #242424;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --accent: #667eea;
+            --accent-secondary: #764ba2;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --error: #f44336;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; 
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary); 
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: 80px;
+        }
+        
+        /* Header - matching index.html */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            background: rgba(26, 26, 26, 0.95);
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .logo i {
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-nav {
+            padding: 0.5rem 1.25rem;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-nav:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 100%);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* Main Container */
+        .container { 
+            max-width: 1600px; 
+            margin: 0 auto; 
+            padding: 2rem;
+        }
+        
+        /* Page Title */
+        .page-title { 
+            color: #ffffff; 
+            margin-bottom: 2rem; 
+            font-size: 3rem; 
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 100%); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+        
+        /* Section Headers */
+        h2 { 
+            color: #ffffff; 
+            margin: 3rem 0 1.5rem 0; 
+            font-size: 1.75rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        /* Model Section */
+        .model-section { 
+            background: var(--bg-card); 
+            border: 1px solid var(--border); 
+            border-radius: 16px; 
+            padding: 2rem; 
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .model-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 2rem; 
+            padding-bottom: 1.5rem; 
+            border-bottom: 1px solid var(--border); 
+        }
+        
+        .model-title { 
+            font-size: 1.5rem; 
+            color: #ffffff; 
+            display: flex; 
+            align-items: center; 
+            gap: 1rem; 
+        }
+        
+        .model-badge { 
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary)); 
+            color: white; 
+            padding: 0.25rem 0.75rem; 
+            border-radius: 20px; 
+            font-size: 0.75rem; 
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        /* Grid Layouts */
+        .layout-grid { 
+            display: grid; 
+            gap: 1.5rem; 
+            margin-bottom: 1.5rem; 
+        }
+        
+        .two-column { 
+            grid-template-columns: 1fr 1fr; 
+        }
+        
+        @media (max-width: 968px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Boxes */
+        .box { 
+            border: 1px solid var(--border); 
+            border-radius: 12px; 
+            padding: 1.75rem; 
+            background: rgba(15, 15, 15, 0.5);
+            backdrop-filter: blur(10px);
+        }
+        
+        .box h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            color: #ffffff;
+            font-weight: 600;
+        }
+        
+        /* Form Controls */
+        .input-group { 
+            margin-bottom: 1.25rem; 
+        }
+        
+        .input-group label { 
+            display: block; 
+            margin-bottom: 0.5rem; 
+            color: var(--text-secondary); 
+            font-size: 0.875rem; 
+            font-weight: 500; 
+        }
+        
+        .input-field { 
+            width: 100%; 
+            padding: 0.75rem; 
+            border: 1px solid var(--border); 
+            background: var(--bg-primary); 
+            color: var(--text-primary); 
+            border-radius: 8px; 
+            font-size: 0.875rem;
+            transition: all 0.3s;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        textarea.input-field { 
+            resize: vertical; 
+            min-height: 120px;
+            font-family: inherit;
+        }
+        
+        /* Upload Zones */
+        .upload-zone { 
+            border: 2px dashed var(--border); 
+            border-radius: 12px; 
+            padding: 2.5rem; 
+            text-align: center; 
+            background: rgba(15, 15, 15, 0.3); 
+            cursor: pointer; 
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .upload-zone:hover { 
+            border-color: var(--accent); 
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .upload-zone.has-file { 
+            border-color: var(--success); 
+            background: rgba(76, 175, 80, 0.05);
+        }
+        
+        .upload-zone i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+        }
+        
+        .upload-zone small {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+        }
+        
+        .preview-container { 
+            margin-top: 1rem; 
+            position: relative; 
+        }
+        
+        .preview-container img { 
+            max-width: 100%; 
+            max-height: 300px; 
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Buttons */
+        .button { 
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary)); 
+            color: white; 
+            border: none; 
+            padding: 1rem 2rem; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .button:disabled { 
+            opacity: 0.5; 
+            cursor: not-allowed; 
+        }
+        
+        /* Sliders */
+        .slider-group { 
+            margin: 1.5rem 0; 
+        }
+        
+        .slider-header { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        .slider-value {
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
+        .slider { 
+            width: 100%; 
+            height: 6px; 
+            border-radius: 3px; 
+            background: var(--border); 
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        
+        /* Checkboxes */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        /* Results */
+        .result { 
+            margin-top: 2rem; 
+        }
+        
+        .result img { 
+            max-width: 100%; 
+            border-radius: 12px; 
+            margin-top: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .note { 
+            color: var(--text-secondary); 
+            font-size: 0.875rem; 
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(102, 126, 234, 0.1);
+            border-left: 3px solid var(--accent);
+            border-radius: 4px;
+        }
+        
+        /* Navigation Grid */
+        .nav-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 1.5rem; 
+        }
+        
+        /* Collapsible Model Selector */
+        .model-selector-wrapper {
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .model-selector-collapsed {
+            max-height: 0;
+            opacity: 0;
+            margin-bottom: 0;
+        }
+        
+        .model-selector-expanded {
+            max-height: 500px;
+            opacity: 1;
+            margin-bottom: 2rem;
+        }
+        
+        .toggle-selector-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .toggle-selector-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+        
+        .toggle-selector-btn i {
+            transition: transform 0.3s;
+        }
+        
+        .toggle-selector-btn.expanded i {
+            transform: rotate(180deg);
+        }
+        
+        .nav-card { 
+            cursor: pointer; 
+            border: 1px solid var(--border); 
+            background: var(--bg-card); 
+            padding: 1.5rem; 
+            border-radius: 12px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .nav-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .nav-card a { 
+            color: inherit; 
+            text-decoration: none; 
+            display: block; 
+        }
+        
+        .nav-card h4 {
+            color: #ffffff;
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .nav-card .note {
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        /* Status Messages */
+        .status-message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .status-info {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: var(--accent);
+        }
+        
+        .status-success {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            color: var(--success);
+        }
+        
+        .status-error {
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            color: var(--error);
+        }
+        
+        /* Loading Spinner */
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+        
+        .spinner {
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 3rem;
+            gap: 1rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            body {
+                padding-top: 120px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🎨 Enhanced AI Image Generation Suite</h1>
+    <!-- Header Navigation -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">
+                <i class="fas fa-rocket"></i>
+                <h1>AI Creative Studio</h1>
+            </a>
+            <div class="nav-buttons">
+                <a href="/" class="btn-nav">
+                    <i class="fas fa-home"></i>
+                    Home
+                </a>
+                <a href="/generator.html" class="btn-nav">
+                    <i class="fas fa-magic"></i>
+                    Generator
+                </a>
+                <a href="/static/gallery.html" class="btn-nav">
+                    <i class="fas fa-images"></i>
+                    Gallery
+                </a>
+                <a href="/static/dashboard.html" class="btn-nav btn-primary">
+                    <i class="fas fa-chart-line"></i>
+                    Dashboard
+                </a>
+            </div>
+        </div>
+    </header>
 
-        <h2>Quick Model Selector</h2>
-        <div class="model-section">
-            <div class="nav-grid">
-                <div class="nav-card"><a href="/models/wan25"><h4>🎯 WAN-25 Preview</h4><p class="note">Advanced text-to-image generation</p></a></div>
-                <div class="nav-card"><a href="/models/qwen-edit"><h4>✏️ Qwen Edit Plus</h4><p class="note">Smart image editing and object manipulation</p></a></div>
-                <div class="nav-card"><a href="/models/product-photoshoot"><h4>📸 Product Photoshoot</h4><p class="note">Professional product photography generation</p></a></div>
+    <!-- Main Content -->
+    <div class="container">
+        <h1 class="page-title">Enhanced AI Image Generation Suite</h1>
+
+        <!-- Toggle Button for Model Selector -->
+        <button class="toggle-selector-btn" id="toggleSelector" onclick="toggleModelSelector()">
+            <i class="fas fa-chevron-down"></i>
+            <span>Show Quick Model Selector</span>
+        </button>
+
+        <!-- Collapsible Model Selector Section -->
+        <div class="model-selector-wrapper model-selector-collapsed" id="modelSelector">
+            <h2><i class="fas fa-th"></i> Quick Model Selector</h2>
+            <div class="model-section">
+                <div class="nav-grid">
+                    <div class="nav-card">
+                        <a href="/models/wan25">
+                            <h4><i class="fas fa-bullseye"></i> WAN-25 Preview</h4>
+                            <p class="note">Advanced text-to-image generation</p>
+                        </a>
+                    </div>
+                    <div class="nav-card">
+                        <a href="/models/qwen-edit">
+                            <h4><i class="fas fa-edit"></i> Qwen Edit Plus</h4>
+                            <p class="note">Smart image editing and object manipulation</p>
+                        </a>
+                    </div>
+                    <div class="nav-card">
+                        <a href="/models/product-photoshoot">
+                            <h4><i class="fas fa-camera"></i> Product Photoshoot</h4>
+                            <p class="note">Professional product photography generation</p>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <h2>Qwen Image Edit Plus - AI-Powered Image Editor</h2>
+        <h2><i class="fas fa-wand-magic-sparkles"></i> Qwen Image Edit Plus - AI-Powered Image Editor</h2>
         <div class="model-section">
             <div class="model-header">
-                <div class="model-title"><span>✏️ Qwen Image Edit Plus</span><span class="model-badge">SMART EDIT</span></div>
+                <div class="model-title">
+                    <i class="fas fa-edit"></i>
+                    <span>Qwen Image Edit Plus</span>
+                    <span class="model-badge">SMART EDIT</span>
+                </div>
             </div>
 
             <form id="qwen-form" enctype="multipart/form-data">
@@ -70,7 +661,9 @@
                         <div class="input-group">
                             <label>Image to Edit *</label>
                             <div id="image-upload" class="upload-zone">
-                                <div>📷 Drop your image here<br><small>or click to browse</small></div>
+                                <i class="fas fa-image"></i>
+                                <div>Drop your image here</div>
+                                <small>or click to browse</small>
                                 <input type="file" name="image" id="qwen-image" accept="image/*" style="display: none;" required>
                             </div>
                             <div id="image-preview" class="preview-container"></div>
@@ -84,7 +677,9 @@
                         <div class="input-group">
                             <label>Mask Image (Optional)</label>
                             <div id="mask-upload" class="upload-zone">
-                                <div>🎭 Upload mask (white = edit area)<br><small>Leave empty for auto-detection</small></div>
+                                <i class="fas fa-mask"></i>
+                                <div>Upload mask (white = edit area)</div>
+                                <small>Leave empty for auto-detection</small>
                                 <input type="file" name="mask" id="qwen-mask" accept="image/*" style="display: none;">
                             </div>
                             <div id="mask-preview" class="preview-container"></div>
@@ -109,7 +704,7 @@
                         <div class="slider-group">
                             <div class="slider-header">
                                 <label>Edit Strength</label>
-                                <span id="strength-value">0.8</span>
+                                <span class="slider-value" id="strength-value">0.8</span>
                             </div>
                             <input type="range" name="edit_strength" id="qwen-strength" class="slider" min="0" max="1" step="0.05" value="0.8">
                         </div>
@@ -117,36 +712,70 @@
                         <div class="slider-group">
                             <div class="slider-header">
                                 <label>Coherence</label>
-                                <span id="coherence-value">0.7</span>
+                                <span class="slider-value" id="coherence-value">0.7</span>
                             </div>
                             <input type="range" name="coherence" id="qwen-coherence" class="slider" min="0" max="1" step="0.05" value="0.7">
                         </div>
 
                         <div class="input-group">
-                            <label>
+                            <label class="checkbox-group">
                                 <input type="checkbox" name="auto_mask" id="qwen-auto-mask" checked>
-                                Auto-detect edit region
+                                <span>Auto-detect edit region</span>
                             </label>
                         </div>
 
                         <div class="input-group">
-                            <label>
+                            <label class="checkbox-group">
                                 <input type="checkbox" name="preserve_style" id="qwen-preserve-style" checked>
-                                Preserve original style
+                                <span>Preserve original style</span>
                             </label>
                         </div>
 
-                        <button type="submit" id="edit-button" class="button" style="width: 100%; margin-top: 20px;">✨ Apply Edit with Qwen</button>
+                        <button type="submit" id="edit-button" class="button" style="width: 100%; margin-top: 1.5rem;">
+                            <i class="fas fa-wand-magic-sparkles"></i>
+                            Apply Edit with Qwen
+                        </button>
                     </div>
                 </div>
             </form>
 
-            <div id="qwen-status" style="margin-top:20px;"></div>
+            <div id="qwen-status" style="margin-top: 1.5rem;"></div>
             <div id="qwen-result" class="result"></div>
         </div>
     </div>
 
     <script>
+        // Toggle Model Selector
+        function toggleModelSelector() {
+            const selector = document.getElementById('modelSelector');
+            const button = document.getElementById('toggleSelector');
+            const buttonText = button.querySelector('span');
+            const isExpanded = selector.classList.contains('model-selector-expanded');
+            
+            if (isExpanded) {
+                selector.classList.remove('model-selector-expanded');
+                selector.classList.add('model-selector-collapsed');
+                button.classList.remove('expanded');
+                buttonText.textContent = 'Show Quick Model Selector';
+            } else {
+                selector.classList.remove('model-selector-collapsed');
+                selector.classList.add('model-selector-expanded');
+                button.classList.add('expanded');
+                buttonText.textContent = 'Hide Quick Model Selector';
+            }
+            
+            // Save preference
+            localStorage.setItem('modelSelectorExpanded', !isExpanded);
+        }
+        
+        // Check saved preference on load
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedState = localStorage.getItem('modelSelectorExpanded');
+            if (savedState === 'true') {
+                toggleModelSelector();
+            }
+        });
+        
         // File upload handling
         function setupUploadZone(zoneId, inputId, previewId) {
             const zone = document.getElementById(zoneId);
@@ -158,15 +787,18 @@
             zone.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 zone.style.borderColor = '#667eea';
+                zone.style.background = 'rgba(102, 126, 234, 0.05)';
             });
             
             zone.addEventListener('dragleave', () => {
-                zone.style.borderColor = '#444';
+                zone.style.borderColor = '';
+                zone.style.background = '';
             });
             
             zone.addEventListener('drop', (e) => {
                 e.preventDefault();
-                zone.style.borderColor = '#444';
+                zone.style.borderColor = '';
+                zone.style.background = '';
                 const files = e.dataTransfer.files;
                 if (files.length > 0) {
                     input.files = files;
@@ -203,19 +835,43 @@
             document.getElementById('coherence-value').textContent = e.target.value;
         });
         
+        // Status helper functions
+        function setStatus(message, type='info') {
+            const el = document.getElementById('qwen-status');
+            if (!el) return;
+            const typeClass = type === 'error' ? 'status-error' : type === 'success' ? 'status-success' : 'status-info';
+            const icon = type === 'error' ? 'fa-exclamation-circle' : type === 'success' ? 'fa-check-circle' : 'fa-info-circle';
+            el.innerHTML = `
+                <div class="status-message ${typeClass}">
+                    <i class="fas ${icon}"></i>
+                    ${message}
+                </div>
+            `;
+        }
+        
+        function showLoading(containerId) {
+            const c = document.getElementById(containerId);
+            if (!c) return;
+            c.innerHTML = `
+                <div class="loading-container">
+                    <div class="spinner"></div>
+                    <p style="color: var(--text-secondary);">Processing your image...</p>
+                </div>
+            `;
+        }
+        
         // Form submission
         document.getElementById('qwen-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const button = document.getElementById('edit-button');
-            const statusDiv = document.getElementById('qwen-status');
-            const resultDiv = document.getElementById('qwen-result');
+            const originalContent = button.innerHTML;
             
             button.disabled = true;
-            button.textContent = '⏳ Processing...';
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
             
-            statusDiv.innerHTML = '<div style="color:#667eea;">Uploading and processing image...</div>';
-            resultDiv.innerHTML = '<div style="text-align:center;"><div style="border:3px solid #222;border-top:3px solid #667eea;border-radius:50%;width:36px;height:36px;margin:0 auto;animation:spin 1s linear infinite"></div></div>';
+            setStatus('Uploading and processing image...', 'info');
+            showLoading('qwen-result');
             
             const formData = new FormData(e.target);
             
@@ -232,25 +888,32 @@
                 }
                 
                 // Display result
+                const resultDiv = document.getElementById('qwen-result');
                 if (data?.result?.images && data.result.images.length > 0) {
                     resultDiv.innerHTML = data.result.images.map(img => 
                         `<img src="${img.url || img}" alt="Edited image">`
                     ).join('');
-                    statusDiv.innerHTML = '<div style="color:#4CAF50;">✅ Edit completed successfully!</div>';
+                    setStatus('Edit completed successfully!', 'success');
                 } else if (data?.result?.message) {
-                    resultDiv.innerHTML = `<div class="note">${data.result.message}</div>`;
-                    statusDiv.innerHTML = '<div style="color:#ff9800;">⚠️ ${data.result.message}</div>';
+                    resultDiv.innerHTML = `<div class="note"><i class="fas fa-info-circle"></i> ${data.result.message}</div>`;
+                    setStatus(data.result.message, 'warning');
                 } else {
                     resultDiv.innerHTML = '<div class="note">No result returned</div>';
+                    setStatus('Processing completed but no image was returned', 'warning');
                 }
                 
             } catch (error) {
                 console.error('Edit error:', error);
-                statusDiv.innerHTML = `<div style="color:#f44336;">❌ Error: ${error.message}</div>`;
-                resultDiv.innerHTML = '';
+                setStatus(`Error: ${error.message}`, 'error');
+                document.getElementById('qwen-result').innerHTML = `
+                    <div class="status-message status-error">
+                        <i class="fas fa-exclamation-circle"></i>
+                        ${error.message}
+                    </div>
+                `;
             } finally {
                 button.disabled = false;
-                button.textContent = '✨ Apply Edit with Qwen';
+                button.innerHTML = originalContent;
             }
         });
     </script>
